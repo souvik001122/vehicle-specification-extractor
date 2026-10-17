@@ -22,6 +22,9 @@ STOPWORDS = {
     "setting", "settings", "i", "my", "f", "150", "ford", "please", "tell", "about", "when", "installing",
     "install", "removal", "remove", "specified", "using", "use", "at", "by", "from", "or", "should", "be",
     "it", "its", "this", "that", "these", "those", "amount", "level", "volume", "refill", "numbers",
+    "which", "listed", "during", "adjustment", "adjust", "applied", "apply", "jam", "minimum", "maximum",
+    "thickness", "runout", "backlash", "clearance", "taper", "angle", "preload", "play", "endplay",
+    "diameter", "length", "wear", "breakaway", "variation", "width", "depth", "front", "rear",
 }
 
 # words that tell which kind of specification is requested
@@ -35,7 +38,7 @@ _TYPE_WORDS = {
 _PART_RE = re.compile(r"\bpart\s*(?:number|no\.?|#)s?\b|\bp/n\b|\bpart\s+numbers\b", re.I)
 
 # words that may be satisfied by the section title instead of the component name ("rear caliper bolts")
-CONTEXT_WORDS = {"front", "rear", "left", "right", "lh", "rh", "4wd", "rwd", "4x4", "4x2", "raptor", "svt"}
+CONTEXT_WORDS = {"front", "rear", "left", "right", "lh", "rh", "4wd", "rwd", "4x4", "4x2", "raptor", "svt", "suspension"}
 
 FASTENERS = {"bolt", "nut", "screw", "stud", "plug", "fitting", "clamp", "washer"}
 
