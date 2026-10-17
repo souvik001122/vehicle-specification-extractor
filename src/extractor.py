@@ -42,6 +42,7 @@ class Record:
     source: str = "table"            # table | procedure | llm
     chunk_id: int = -1
     section_id: str = field(default="", repr=False)
+    context: str = field(default="", repr=False)   # heading the value was found under, e.g. "Toe Adjustment - Front"
 
     @property
     def key(self) -> tuple:
@@ -65,7 +66,7 @@ _TIGHTEN = re.compile(
 )
 _FASTENER_PHRASE = re.compile(
     r"(?i)(?:remove|install|loosen|discard|position|disconnect|connect|torque|tighten)\s+(?:and\s+discard\s+)?(?:the\s+)?"
-    r"(?:\d+(?:\s+or\s+\d+)?\s+)?(?:new\s+)?(?P<c>[A-Za-z][A-Za-z0-9\-/®() ]{2,60}?(?:bolts?|nuts?|screws?|studs?|fittings?|plugs?))\b"
+    r"(?:\d+(?:\s+or\s+\d+)?\s+)?(?:new\s+)?(?P<c>[A-Za-z][A-Za-z0-9\-/®() ]{2,60}?(?:bolts?|nuts?(?:\s*\(\s*s\s*\))?|screws?|studs?|fittings?|plugs?))"
 )
 _FILL = re.compile(
     r"(?i)\bfill\b[^.\n]{0,60}?\bwith\s+(?P<v>\d[\d,]*(?:\.\d+)?)\s*(?P<u>ml|L)\b[^.;\n]*?\bof\s+"
@@ -120,14 +121,23 @@ def procedure_records(chunk: Chunk, known: set[tuple]) -> list[Record]:
         value = m.group("v")
         if (chunk.section_id, value, unit) in known:
             continue
-        window = text[max(0, m.start() - 260):m.start()]
-        found = list(_FASTENER_PHRASE.finditer(window))
-        component = _cap(found[-1].group("c").strip()) if found else f"{heading} fasteners"
-        out.append(Record(component, "Torque", value, unit, chunk.section, "procedure", chunk.id, chunk.section_id))
+        # The component is usually stated between "Tighten" and "to <value>".
+        # Use that direct phrase first; searching only the text before "Tighten"
+        # misses steps such as "Tighten the tie-rod end jam nut(s) to 103 Nm".
+        mid = re.sub(r"(?i)^\s*(?:the\s+)?", "", m.group("mid")).strip()
+        generic = re.fullmatch(r"(?i)(?:\d+\s+)?(?:new\s+|all\s+)?(?:bolts?|nuts?(?:\s*\(s\))?|screws?|studs?|fittings?|plugs?)", mid)
+        if not generic and re.search(r"(?i)(?:bolts?|nuts?(?:\s*\(s\))?|screws?|studs?|fittings?|plugs?)$", mid):
+            component = _cap(mid)
+        else:
+            window = text[max(0, m.start() - 260):m.start()]
+            found = list(_FASTENER_PHRASE.finditer(window))
+            component = _cap(found[-1].group("c").strip()) if found else f"{heading} fasteners"
+        out.append(Record(component, "Torque", value, unit, chunk.section, "procedure", chunk.id, chunk.section_id,
+                          context=chunk.heading))
     for m in _FILL.finditer(text):
         value = m.group("v").replace(",", "")
         out.append(Record(_cap(m.group("c").strip()), "Fluid Capacity", value, m.group("u"), chunk.section,
-                          "procedure", chunk.id, chunk.section_id))
+                          "procedure", chunk.id, chunk.section_id, context=chunk.heading))
     return out
 
 
@@ -140,11 +150,17 @@ def _match_score(rec: Record, qs: QuerySpec) -> tuple[int, int]:
     """(keywords found, keywords found inside the component/spec_type itself).
 
     A keyword must be in the component (or spec_type) unless it is a region word such as
-    front/rear/4WD, which may also be satisfied by the section title.
+    front/rear/4WD, which may also be satisfied by the section title.  For a value found in a
+    procedure step the heading of that step ("Toe Adjustment - Front") may also supply up to two
+    missing words - but only when the component itself already matches at least three words.
+    That is what lets a natural question such as "torque for the tie-rod end jam nut during front
+    toe adjustment" match "Tie-rod end jam nut(s)" found under the heading "Toe Adjustment - Front".
     """
     comp = set(tokenize(rec.component + " " + rec.spec_type))
     ctx = set(tokenize(rec.section))
+    head = set(tokenize(rec.context)) if rec.source == "procedure" else set()
     found = in_comp = 0
+    via_heading = 0
     for kw in qs.keywords:
         syn = synonyms(kw)
         if syn & comp:
@@ -152,6 +168,10 @@ def _match_score(rec: Record, qs: QuerySpec) -> tuple[int, int]:
             in_comp += 1
         elif kw in CONTEXT_WORDS and syn & ctx:
             found += 1
+        elif syn & head:
+            via_heading += 1
+    if via_heading and via_heading <= 2 and in_comp >= 3:
+        found += via_heading
     return found, in_comp
 
 
