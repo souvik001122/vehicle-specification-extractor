@@ -100,27 +100,33 @@ class Retriever:
             fused[i] *= boost
         ranked = sorted(fused.items(), key=lambda kv: -kv[1])
 
-        # Query-aware precision guard: if the query names a concrete component, prefer
-        # chunks that actually mention every component keyword. This prevents a query
-        # like "Torque for brake caliper bolts" from filling the result list with generic
-        # brake-booster/halfshaft tables merely because they contain the word "brake".
-        # Keep the original ranking as a fallback for paraphrased queries where no exact
-        # match is present, so recall is not sacrificed unnecessarily.
+        # Soft precision step (never a hard filter - a spec table often lacks one query word, e.g.
+        # "drive" in "Front drive axle lubricant capacity", and must not be thrown away):
+        # chunks that mention every component word (section title included) move ahead of the rest.
+        flags: dict[int, bool] = {}
         if qs.keywords:
-            required = set(qs.keywords)
-            relevant: list[tuple[int, float]] = []
-            for i, score in ranked:
-                chunk = self.chunks[i]
-                text_tokens = set(tokenize(f"{chunk.heading} {chunk.text}"))
-                matched = sum(1 for kw in required if synonyms(kw) & text_tokens)
-                coverage = matched / len(required)
-                # A named fastener should be present in the passage too, not just in a
-                # nearby section. "bolt" also matches the stemmed plural "bolts".
-                fastener_ok = not qs.fastener or qs.fastener in text_tokens
-                if coverage == 1.0 and fastener_ok:
-                    relevant.append((i, score))
-            if relevant:
-                ranked = relevant
+            def frac(i: int) -> float:
+                c = self.chunks[i]
+                toks = set(tokenize(f"{c.section_title} {c.heading} {c.text}"))
+                return sum(1 for kw in qs.keywords if synonyms(kw) & toks) / len(qs.keywords)
+            cov = {i: frac(i) for i, _ in ranked[:pool]}
+            flags = {i: v == 1.0 for i, v in cov.items()}
+            full = [t for t in ranked if flags.get(t[0])]
+            partial = [t for t in ranked if not flags.get(t[0]) and cov.get(t[0], 0) >= 0.75]
+            if full or partial:               # never leave the list empty: else keep the original order
+                ranked = full + partial
 
-        ranked = ranked[:k]
+        # Reserved slots: the answer to a quantitative question lives in a spec table, so the best
+        # table chunks of the matching kind are always part of the result, whatever the dense
+        # embedding model (sbert / openai / tfidf) thought of them.
+        top = ranked[:k]
+        if preferred:
+            flags = locals().get("flags", {})
+            have = {i for i, _ in top}
+            need = max(0, 2 - sum(1 for i in have if self.chunks[i].kind in preferred))
+            tables = [t for t in ranked if t[0] not in have and self.chunks[t[0]].kind in preferred
+                      and (flags.get(t[0], False) or not qs.keywords)][:need]
+            if tables:                       # drop the weakest hits to make room
+                top = top[:max(0, k - len(tables))] + tables
+        ranked = top
         return [(self.chunks[i], s) for i, s in ranked]
