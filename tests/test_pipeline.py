@@ -169,6 +169,8 @@ Brake caliper guide pin bolts
         from src.extractor import procedure_records
         records = procedure_records(chunk, set())
         self.assertTrue(any(r.value == "103" and r.unit == "Nm" for r in records), records)
+        # Parenthetical plural "(s)" is common in procedures; retain the actual component.
+        self.assertTrue(any("tie-rod end jam nut" in r.component.lower() for r in records), records)
 
     def test_embedded_spec_table_is_parsed(self):
         chunk = Chunk(
