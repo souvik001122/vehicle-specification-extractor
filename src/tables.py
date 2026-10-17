@@ -49,6 +49,36 @@ def torque_columns(header: str) -> list[str]:
     return m.group(1).split() if m else []
 
 
+def normalize_torque_header_lines(lines: list[str]) -> list[str]:
+    """Join PDF headers where 'Description' and unit labels are extracted on separate lines."""
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        current = re.sub(r"\s+", " ", lines[i]).strip()
+        if current.lower() == "description":
+            labels: list[str] = []
+            j = i + 1
+            while j < len(lines) and len(labels) < 3:
+                tokens = re.sub(r"\s+", " ", lines[j]).strip().split()
+                if not tokens or any(token not in UNITS_T for token in tokens):
+                    break
+                labels.extend(tokens)
+                j += 1
+            if labels and all(label in UNITS_T for label in labels):
+                out.append("Description " + " ".join(labels))
+                i = j
+                continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+def has_torque_table_header(lines: list[str]) -> bool:
+    """Return whether lines contain a normal or split-line torque table header."""
+    return any(TORQUE_HDR.match(re.sub(r"\s+", " ", ln).strip())
+               for ln in normalize_torque_header_lines(lines))
+
+
 # --------------------------------------------------------------------------- torque
 def parse_torque_row(line: str, columns: list[str]) -> tuple[str, dict[str, str]] | None:
     """'Brake caliper guide pin bolts 37 27 —' -> ('Brake caliper guide pin bolts', {'Nm': '37', 'lb-ft': '27'})"""
@@ -67,30 +97,86 @@ def parse_torque_row(line: str, columns: list[str]) -> tuple[str, dict[str, str]
 
 
 def parse_torque_table(lines: list[str]) -> list[dict]:
-    """Parse every torque row in ``lines`` (header line first). Handles wrapped names."""
+    """Parse torque tables from both clean text dumps and PDF text extraction.
+
+    PDF parsers sometimes place the component name, numeric cells, and dash placeholders
+    on separate lines. This parser supports both that layout and conventional one-line rows.
+    It stops when a different table/header or clear prose begins, preventing nearby tables
+    from being misread as torque rows.
+    """
+    lines = normalize_torque_header_lines(lines)
     cols: list[str] = []
     out: list[dict] = []
-    pending: list[str] = []
-    for ln in lines:
+    pending_name: list[str] = []
+    pending_vals: list[str] = []
+    in_table = False
+
+    def emit(name: str, vals: list[str]) -> None:
+        name = re.sub(r"\s[a-z]$", "", name).strip()
+        if not name or not re.search(r"[A-Za-z]{2}", name):
+            return
+        mapped = {c: v for c, v in zip(cols, vals) if NUM.match(v)}
+        for unit in UNITS_T:  # prefer metric, then imperial columns
+            if unit in mapped:
+                out.append({"component": name, "value": mapped[unit], "unit": unit})
+                return
+
+    for raw in lines:
+        ln = re.sub(r"\s+", " ", raw).strip()
+        if not ln:
+            continue
         if TORQUE_HDR.match(ln):
-            cols, pending = torque_columns(ln), []
+            cols = torque_columns(ln)
+            in_table = True
+            pending_name, pending_vals = [], []
             continue
-        if not cols or FOOTNOTE_RE.match(ln) or ln.lower().endswith("specifications"):
+        if not in_table:
             continue
+        if (SPEC_HDR.match(ln) or MATERIAL_HDR.match(ln) or PARTS_HDR.match(ln)
+                or re.match(r"^(?:SECTION\s+\d{3}-\d{2}|GENERAL PROCEDURES|REMOVAL AND INSTALLATION|SPECIFICATIONS)$", ln, re.I)):
+            break
+        if FOOTNOTE_RE.match(ln) or ln.lower().endswith("specifications"):
+            if pending_name and not pending_vals:
+                pending_name = []
+            continue
+
+        # Common PDF layout: values occupy their own line, sometimes followed by a dash line.
+        toks = ln.split()
+        if toks and all(NUM.match(t) or t in DASHES for t in toks):
+            if pending_name:
+                pending_vals.extend(toks)
+                if len(pending_vals) >= len(cols):
+                    emit(" ".join(pending_name), pending_vals[:len(cols)])
+                    pending_name, pending_vals = [], []
+            continue
+
+        # Conventional row with the component and values on one line.
         row = parse_torque_row(ln, cols)
         if row:
+            if pending_name and pending_vals:
+                emit(" ".join(pending_name), pending_vals[:len(cols)])
             name, vals = row
-            if pending and name[:1].islower():          # wrapped name: previous fragment + this line
-                name = " ".join(pending) + " " + name
-            pending = []
-            for unit in UNITS_T:                          # prefer metric, then lb-ft, then lb-in
-                if unit in vals:
-                    out.append({"component": name, "value": vals[unit], "unit": unit})
-                    break
-        elif len(ln) < 70 and not ln.endswith(".") and not SENTENCE_START.match(ln):
-            pending = (pending + [ln])[-1:]
-        else:
-            pending = []
+            emit(name, [vals.get(c, "—") for c in cols])
+            pending_name, pending_vals = [], []
+            continue
+
+        # A new alphabetic line starts a new component or continues a wrapped component name.
+        if re.search(r"[A-Za-z]{2}", ln) and not SENTENCE_START.match(ln):
+            if pending_name and pending_vals:
+                # Flush any incomplete prior row instead of attaching it to the next component.
+                pending_name, pending_vals = [], []
+            if pending_name and not pending_vals:
+                pending_name.append(ln)
+            else:
+                pending_name = [ln]
+            continue
+
+        # Don't let procedural prose after a table become a component name.
+        if pending_name and pending_vals:
+            pending_name, pending_vals = [], []
+        elif pending_name and (ln.endswith(".") or SENTENCE_START.match(ln)):
+            pending_name = []
+
     return out
 
 
