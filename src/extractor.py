@@ -23,7 +23,7 @@ from typing import Callable
 import config
 from .chunking import Chunk
 from .tables import (
-    UNITS_T, parse_material_table, parse_parts_table, parse_spec_table, parse_torque_table,
+    UNITS_T, has_torque_table_header, parse_material_table, parse_parts_table, parse_spec_table, parse_torque_table,
 )
 from .textutil import CONTEXT_WORDS, FASTENERS, QuerySpec, parse_query, synonyms, tokenize
 
@@ -82,7 +82,9 @@ def table_records(chunk: Chunk) -> list[Record]:
     lines = chunk.text.split("\n")
     sec, sid = chunk.section, chunk.section_id
     out: list[Record] = []
-    if chunk.kind == "torque_table":
+    # PDFs often flatten specification tables into ordinary text chunks. Detect and parse
+    # embedded torque tables regardless of the chunk kind, while keeping section metadata.
+    if chunk.kind == "torque_table" or has_torque_table_header(lines):
         for r in parse_torque_table(lines):
             out.append(Record(_cap(r["component"]), "Torque", r["value"], r["unit"], sec, "table", chunk.id, sid))
     elif chunk.kind == "spec_table":
@@ -221,9 +223,11 @@ class RuleExtractor:
         qs = parse_query(query)
         cands: list[Record] = []
         for chunk, _ in hits:
-            if chunk.is_table:
+            # A PDF-extracted torque table may be embedded inside a general text chunk.
+            # Parse table rows first, then procedure instructions from the same chunk.
+            if chunk.is_table or has_torque_table_header(chunk.text.split("\n")):
                 cands.extend(self._table(chunk))
-            else:
+            if not chunk.is_table:
                 for r in procedure_records(chunk, self.known):
                     if r.spec_type == "Fluid Capacity" and r.section_id in self.cap_sections:
                         continue
