@@ -65,7 +65,7 @@ _TIGHTEN = re.compile(
 )
 _FASTENER_PHRASE = re.compile(
     r"(?i)(?:remove|install|loosen|discard|position|disconnect|connect|torque|tighten)\s+(?:and\s+discard\s+)?(?:the\s+)?"
-    r"(?:\d+(?:\s+or\s+\d+)?\s+)?(?:new\s+)?(?P<c>[A-Za-z][A-Za-z0-9\-/®() ]{2,60}?(?:bolts?|nuts?(?:\s*\(\s*s\s*\))?|screws?|studs?|fittings?|plugs?))"
+    r"(?:\d+(?:\s+or\s+\d+)?\s+)?(?:new\s+)?(?P<c>[A-Za-z][A-Za-z0-9\-/®() ]{2,60}?(?:bolts?|nuts?|screws?|studs?|fittings?|plugs?))\b"
 )
 _FILL = re.compile(
     r"(?i)\bfill\b[^.\n]{0,60}?\bwith\s+(?P<v>\d[\d,]*(?:\.\d+)?)\s*(?P<u>ml|L)\b[^.;\n]*?\bof\s+"
@@ -120,16 +120,9 @@ def procedure_records(chunk: Chunk, known: set[tuple]) -> list[Record]:
         value = m.group("v")
         if (chunk.section_id, value, unit) in known:
             continue
-        # The component is usually stated between "Tighten" and "to <value>".
-        # Use that direct phrase first; searching only the text before "Tighten"
-        # misses steps such as "Tighten the tie-rod end jam nut(s) to 103 Nm".
-        mid = re.sub(r"(?i)^\s*(?:the\s+)?", "", m.group("mid")).strip()
-        if re.search(r"(?i)(?:bolts?|nuts?(?:\s*\(s\))?|screws?|studs?|fittings?|plugs?)$", mid):
-            component = _cap(mid)
-        else:
-            window = text[max(0, m.start() - 260):m.start()]
-            found = list(_FASTENER_PHRASE.finditer(window))
-            component = _cap(found[-1].group("c").strip()) if found else f"{heading} fasteners"
+        window = text[max(0, m.start() - 260):m.start()]
+        found = list(_FASTENER_PHRASE.finditer(window))
+        component = _cap(found[-1].group("c").strip()) if found else f"{heading} fasteners"
         out.append(Record(component, "Torque", value, unit, chunk.section, "procedure", chunk.id, chunk.section_id))
     for m in _FILL.finditer(text):
         value = m.group("v").replace(",", "")
