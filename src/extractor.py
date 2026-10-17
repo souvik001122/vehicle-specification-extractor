@@ -23,7 +23,7 @@ from typing import Callable
 import config
 from .chunking import Chunk
 from .tables import (
-    UNITS_T, has_torque_table_header, parse_material_table, parse_parts_table, parse_spec_table, parse_torque_table,
+    UNITS_T, SPEC_HDR, has_torque_table_header, parse_material_table, parse_parts_table, parse_spec_table, parse_torque_table,
 )
 from .textutil import CONTEXT_WORDS, FASTENERS, QuerySpec, parse_query, synonyms, tokenize
 
@@ -87,7 +87,7 @@ def table_records(chunk: Chunk) -> list[Record]:
     if chunk.kind == "torque_table" or has_torque_table_header(lines):
         for r in parse_torque_table(lines):
             out.append(Record(_cap(r["component"]), "Torque", r["value"], r["unit"], sec, "table", chunk.id, sid))
-    elif chunk.kind == "spec_table":
+    elif chunk.kind == "spec_table" or any(SPEC_HDR.match(re.sub(r"\s+", " ", ln).strip()) for ln in lines):
         for r in parse_spec_table(lines):
             out.append(Record(r["component"], r["spec_type"], r["value"], r["unit"], sec, "table", chunk.id, sid))
     elif chunk.kind == "material_table":
@@ -182,8 +182,8 @@ def filter_and_rank(records: list[Record], qs: QuerySpec) -> list[Record]:
         fast = [(r, f, c) for r, f, c in strict if FASTENERS & set(tokenize(r.component)) and
                 any(syn in tokenize(r.component) for syn in synonyms(qs.fastener))]
         strict = fast or strict
-    if not strict and n >= 3:  # relax: a long question may have one word the manual phrases differently
-        strict = [(r, f, c) for r, f, c in scored if f >= n - 1 and c >= 2]
+    if not strict and n >= 3:  # relax one wording mismatch, but require at least two matching query terms
+        strict = [(r, f, c) for r, f, c in scored if f >= n - 1 and c >= 1]
     strict.sort(key=lambda t: (-t[1], -t[2]))
     return [r for r, _, _ in strict]
 
