@@ -1,4 +1,5 @@
 """Streamlit UI (bonus):  streamlit run app.py"""
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -15,7 +16,9 @@ st.title("Vehicle Specification Extractor")
 
 
 @st.cache_resource(show_spinner="Indexing the manual...")
-def load(path, extract_backend):
+def load(path, extract_backend, content_hash=""):
+    # Include the uploaded file's content hash in Streamlit's cache key.
+    # Re-uploading a different PDF with the same filename must rebuild the index.
     return Pipeline(path, extract_backend=extract_backend)
 
 
@@ -26,12 +29,17 @@ with st.sidebar:
     top_k = st.slider("Chunks retrieved", 3, 15, config.TOP_K)
 
 src = None
+content_hash = "default"
 if upload:
-    config.DATA_DIR.mkdir(exist_ok=True)
-    src = config.CACHE_DIR / upload.name
+    payload = upload.getvalue()
+    content_hash = hashlib.sha256(payload).hexdigest()
     config.CACHE_DIR.mkdir(exist_ok=True)
-    src.write_bytes(upload.getvalue())
-pipe = load(str(src) if src else None, backend)
+    # Unique path prevents same-name uploads from overwriting a file used by a cached pipeline.
+    suffix = Path(upload.name).suffix.lower() or ".pdf"
+    src = config.CACHE_DIR / f"{Path(upload.name).stem}-{content_hash[:16]}{suffix}"
+    if not src.exists():
+        src.write_bytes(payload)
+pipe = load(str(src) if src else None, backend, content_hash)
 st.caption(f"{pipe.source.name}: {len(pipe.pages)} pages, {len(pipe.chunks)} chunks, "
            f"embeddings={pipe.retriever.embedder.backend}, extractor={pipe.extractor.name}")
 
