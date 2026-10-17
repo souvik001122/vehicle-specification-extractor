@@ -8,7 +8,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import config  # noqa: E402
-from src.extractor import Extractor, parse_llm_json, public, value_in_text  # noqa: E402
+from src.extractor import Extractor, parse_llm_json, public, value_in_text, table_records  # noqa: E402
+from src.chunking import Chunk  # noqa: E402
 from src.main import Pipeline, write_output  # noqa: E402
 from src.textutil import parse_query  # noqa: E402
 
@@ -67,10 +68,20 @@ class TestExtraction(unittest.TestCase):
 
     def test_caliper_bolts_front_and_rear_differ(self):
         rs = rows("Torque for brake caliper bolts")
-        self.assertTrue(has(rs, "guide pin", "37", "Nm", "206-03"))
-        self.assertTrue(has(rs, "guide pin", "33", "Nm", "206-04"))
-        self.assertTrue(has(rs, "anchor plate", "250", "Nm"))
-        self.assertTrue(has(rs, "support bracket", "150", "Nm"))
+        # Check every relevant row, not just a subset: front and rear values differ.
+        expected = [
+            ("anchor plate", "250", "206-03"),
+            ("flow bolt", "35", "206-03"),
+            ("guide pin", "37", "206-03"),
+            ("flow bolt", "35", "206-04"),
+            ("guide pin", "33", "206-04"),
+            ("support bracket", "150", "206-04"),
+        ]
+        for component, value, section in expected:
+            self.assertTrue(has(rs, component, value, "Nm", section),
+                            msg=f"Missing {component} = {value} Nm in {section}; got {rs}")
+        self.assertEqual(sum(1 for r in rs if r["spec_type"] == "Torque"), 6,
+                         msg=f"Expected six brake-caliper torque rows, got {rs}")
 
     def test_caliper_query_prioritizes_direct_evidence(self):
         _, hits, _ = pipe().run("Torque for brake caliper bolts")
@@ -101,6 +112,53 @@ class TestExtraction(unittest.TestCase):
         rs = rows("Brake disc minimum thickness")
         self.assertTrue(has(rs, "Front brake disc", "32", "mm"))
         self.assertTrue(has(rs, "Rear brake disc", "23.0", "mm"))
+
+    def test_pdf_flattened_torque_table_is_parsed_from_text_chunk(self):
+        # PDF text extraction can put a table row's name, values, and dash cells on separate lines.
+        chunk = Chunk(
+            id=9999, doc_index=0, section_id="206-03", section_title="Front Disc Brake",
+            mode="SPECIFICATIONS", heading="General Specifications", kind="text",
+            text="""Description Nm lb-ft lb-in
+Brake caliper anchor plate bolts
+250 184
+—
+Brake caliper flow bolt
+35 26
+—
+Brake caliper guide pin bolts
+37 27
+—
+Item Specification""",
+        )
+        records = table_records(chunk)
+        self.assertTrue(any(r.component.lower() == "brake caliper guide pin bolts" and r.value == "37" and r.unit == "Nm" for r in records))
+        self.assertTrue(any(r.component.lower() == "brake caliper anchor plate bolts" and r.value == "250" and r.unit == "Nm" for r in records))
+
+    def test_pdf_split_torque_header_and_rows_are_parsed_from_text_chunk(self):
+        # Some PDF parsers emit the table header labels and each cell on separate lines.
+        chunk = Chunk(
+            id=10000, doc_index=0, section_id="206-03", section_title="Front Disc Brake",
+            mode="SPECIFICATIONS", heading="General Specifications", kind="text",
+            text="""Description
+Nm
+lb-ft
+lb-in
+Brake caliper anchor plate bolts
+250 184
+—
+Brake caliper flow bolt
+35
+26
+—
+Brake caliper guide pin bolts
+37
+27
+—""",
+        )
+        records = table_records(chunk)
+        self.assertTrue(any(r.component.lower() == "brake caliper anchor plate bolts" and r.value == "250" and r.unit == "Nm" for r in records), records)
+        self.assertTrue(any(r.component.lower() == "brake caliper flow bolt" and r.value == "35" and r.unit == "Nm" for r in records), records)
+        self.assertTrue(any(r.component.lower() == "brake caliper guide pin bolts" and r.value == "37" and r.unit == "Nm" for r in records), records)
 
     def test_nonsense_returns_nothing(self):
         self.assertEqual(rows("Torque for flux capacitor bolts"), [])
