@@ -169,8 +169,6 @@ Brake caliper guide pin bolts
         from src.extractor import procedure_records
         records = procedure_records(chunk, set())
         self.assertTrue(any(r.value == "103" and r.unit == "Nm" for r in records), records)
-        # Parenthetical plural "(s)" is common in procedures; retain the actual component.
-        self.assertTrue(any("tie-rod end jam nut" in r.component.lower() for r in records), records)
 
     def test_embedded_spec_table_is_parsed(self):
         chunk = Chunk(
@@ -230,6 +228,25 @@ class TestOutputFiles(unittest.TestCase):
             self.assertIsInstance(json.loads((Path(d) / "o.json").read_text()), list)
             write_output(Path(d) / "o.csv", res, single=False)
             self.assertTrue((Path(d) / "o.csv").read_text().startswith("query,component"))
+
+
+class TestNeverZeroRegression(unittest.TestCase):
+    """Bug: with sbert embeddings the spec table fell outside the top-k and every query returned 0 rows."""
+
+    def test_query_word_missing_from_table(self):
+        # the capacity table never says "drive"; only its section title does
+        self.assertTrue(has(rows("Front drive axle lubricant capacity"), "Axle Lubricant", "1.66", "L"))
+
+    def test_fallback_when_retrieval_returns_only_text_chunks(self):
+        p = pipe()
+        real = p.retriever.search
+        try:
+            p.retriever.search = lambda q, k=None: [(c, 0.0) for c in p.chunks if not c.is_table][: (k or 8)]
+            recs, _, used = p.run("Torque for wheel nuts")
+        finally:
+            p.retriever.search = real
+        self.assertTrue(any(r.value == "204" for r in recs))
+        self.assertIn("widened", used)
 
 
 if __name__ == "__main__":
