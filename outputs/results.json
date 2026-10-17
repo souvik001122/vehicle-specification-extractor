@@ -1,0 +1,620 @@
+[
+  {
+    "query": "Torque for brake caliper bolts",
+    "results": [
+      {
+        "component": "Brake caliper anchor plate bolts",
+        "spec_type": "Torque",
+        "value": "250",
+        "unit": "Nm",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "Brake caliper flow bolt",
+        "spec_type": "Torque",
+        "value": "35",
+        "unit": "Nm",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "Brake caliper guide pin bolts",
+        "spec_type": "Torque",
+        "value": "37",
+        "unit": "Nm",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "Brake caliper flow bolt",
+        "spec_type": "Torque",
+        "value": "35",
+        "unit": "Nm",
+        "section": "206-04: Rear Disc Brake"
+      },
+      {
+        "component": "Brake caliper guide pin bolts",
+        "spec_type": "Torque",
+        "value": "33",
+        "unit": "Nm",
+        "section": "206-04: Rear Disc Brake"
+      },
+      {
+        "component": "Brake caliper support bracket bolts",
+        "spec_type": "Torque",
+        "value": "150",
+        "unit": "Nm",
+        "section": "206-04: Rear Disc Brake"
+      }
+    ]
+  },
+  {
+    "query": "Torque for wheel nuts",
+    "results": [
+      {
+        "component": "Wheel hub nut",
+        "spec_type": "Torque",
+        "value": "40",
+        "unit": "Nm",
+        "section": "205-04: Front Drive Halfshafts"
+      },
+      {
+        "component": "Wheel nuts",
+        "spec_type": "Torque",
+        "value": "204",
+        "unit": "Nm",
+        "section": "204-04: Wheels and Tires"
+      }
+    ]
+  },
+  {
+    "query": "Torque for stabilizer bar link nuts",
+    "results": [
+      {
+        "component": "Stabilizer bar link nuts",
+        "spec_type": "Torque",
+        "value": "70",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      },
+      {
+        "component": "Stabilizer bar link nuts (SVT Raptor)",
+        "spec_type": "Torque",
+        "value": "80",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      },
+      {
+        "component": "Stabilizer bar link nuts",
+        "spec_type": "Torque",
+        "value": "70",
+        "unit": "Nm",
+        "section": "204-01A: Front Suspension — Rear Wheel Drive (RWD)"
+      },
+      {
+        "component": "Stabilizer bar link lower nuts",
+        "spec_type": "Torque",
+        "value": "80",
+        "unit": "Nm",
+        "section": "204-00: Suspension System — General Information"
+      }
+    ]
+  },
+  {
+    "query": "Torque for shock absorber lower nut",
+    "results": [
+      {
+        "component": "Shock absorber lower nuts",
+        "spec_type": "Torque",
+        "value": "90",
+        "unit": "Nm",
+        "section": "204-01A: Front Suspension — Rear Wheel Drive (RWD)"
+      },
+      {
+        "component": "Shock absorber lower nut (SVT Raptor)",
+        "spec_type": "Torque",
+        "value": "550",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      },
+      {
+        "component": "Shock absorber lower nuts",
+        "spec_type": "Torque",
+        "value": "90",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      },
+      {
+        "component": "Lower shock absorber nuts",
+        "spec_type": "Torque",
+        "value": "90",
+        "unit": "Nm",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Lower shock absorber nuts",
+        "spec_type": "Torque",
+        "value": "90",
+        "unit": "Nm",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Torque for rear driveshaft flange bolts",
+    "results": [
+      {
+        "component": "Rear driveshaft flange bolts",
+        "spec_type": "Torque",
+        "value": "103",
+        "unit": "Nm",
+        "section": "205-01: Driveshaft"
+      },
+      {
+        "component": "Driveshaft flange bolts",
+        "spec_type": "Torque",
+        "value": "103",
+        "unit": "Nm",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Torque for differential housing cover bolts",
+    "results": [
+      {
+        "component": "Differential housing cover bolts",
+        "spec_type": "Torque",
+        "value": "32",
+        "unit": "Nm",
+        "section": "205-03: Front Drive Axle/Differential"
+      },
+      {
+        "component": "Differential housing cover bolts",
+        "spec_type": "Torque",
+        "value": "45",
+        "unit": "Nm",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Differential housing cover bolts",
+        "spec_type": "Torque",
+        "value": "45",
+        "unit": "Nm",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Rear axle lubricant capacity",
+    "results": [
+      {
+        "component": "Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant",
+        "spec_type": "Fluid Capacity",
+        "value": "2.84",
+        "unit": "L",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Motorcraft SAE 80W-90 Premium Rear Axle Lubricant",
+        "spec_type": "Fluid Capacity",
+        "value": "1.66",
+        "unit": "L",
+        "section": "205-03: Front Drive Axle/Differential"
+      },
+      {
+        "component": "Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (ELD only)",
+        "spec_type": "Fluid Capacity",
+        "value": "2.84",
+        "unit": "L",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (Non Traction-Lok equipped)",
+        "spec_type": "Fluid Capacity",
+        "value": "2.60",
+        "unit": "L",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (Traction-Lok equipped)",
+        "spec_type": "Fluid Capacity",
+        "value": "2.48",
+        "unit": "L",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Brake fluid capacity",
+    "results": [
+      {
+        "component": "High Performance DOT 3 Motor Vehicle Brake Fluid",
+        "spec_type": "Fluid Capacity",
+        "value": "740",
+        "unit": "ml",
+        "section": "206-09: Anti-Lock Brake System (ABS) and Stability Control"
+      },
+      {
+        "component": "Motorcraft High Performance DOT 3 Motor Vehicle Brake Fluid (US) / Motorcraft Brake Fluid - Heavy Duty DOT 3 (Canada)",
+        "spec_type": "Fluid Capacity",
+        "value": "740",
+        "unit": "ml",
+        "section": "206-06: Hydraulic Brake Actuation"
+      },
+      {
+        "component": "High Performance DOT 3 Motor Vehicle Brake Fluid",
+        "spec_type": "Fluid Capacity",
+        "value": "1420",
+        "unit": "ml",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "High Performance DOT 3 Motor Vehicle Brake Fluid",
+        "spec_type": "Fluid Capacity",
+        "value": "1420",
+        "unit": "ml",
+        "section": "206-04: Rear Disc Brake"
+      },
+      {
+        "component": "Motorcraft High Performance DOT 3 Motor Vehicle Brake Fluid (US) / Motorcraft Brake Fluid - Heavy Duty DOT 3 (Canada)",
+        "spec_type": "Fluid Capacity",
+        "value": "1420",
+        "unit": "ml",
+        "section": "206-00: Brake System — General Information"
+      }
+    ]
+  },
+  {
+    "query": "Part number for shock absorber",
+    "results": [
+      {
+        "component": "Shock absorber lower bolt",
+        "spec_type": "Part Number",
+        "value": "W506545",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber lower nut",
+        "spec_type": "Part Number",
+        "value": "W520214",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber",
+        "spec_type": "Part Number",
+        "value": "18125",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber upper bolt",
+        "spec_type": "Part Number",
+        "value": "W506545",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber upper nut",
+        "spec_type": "Part Number",
+        "value": "W520214",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber",
+        "spec_type": "Part Number",
+        "value": "18080",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber shield",
+        "spec_type": "Part Number",
+        "value": "18159",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber shield bolt (3 required)",
+        "spec_type": "Part Number",
+        "value": "18A149-B",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Shock absorber shield washer",
+        "spec_type": "Part Number",
+        "value": "18A149-C",
+        "unit": "",
+        "section": "204-02: Rear Suspension"
+      },
+      {
+        "component": "Lower shock absorber nuts (2 required)",
+        "spec_type": "Part Number",
+        "value": "W520214",
+        "unit": "",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Lower shock absorber bolts (2 required)",
+        "spec_type": "Part Number",
+        "value": "W506545",
+        "unit": "",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Lower shock absorber nuts (2 required)",
+        "spec_type": "Part Number",
+        "value": "W520214",
+        "unit": "",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Lower shock absorber bolts (2 required)",
+        "spec_type": "Part Number",
+        "value": "W506545",
+        "unit": "",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Brake disc minimum thickness",
+    "results": [
+      {
+        "component": "Front brake disc",
+        "spec_type": "Minimum thickness",
+        "value": "32",
+        "unit": "mm",
+        "section": "206-00: Brake System — General Information"
+      },
+      {
+        "component": "Rear brake disc",
+        "spec_type": "Minimum thickness",
+        "value": "23.0",
+        "unit": "mm",
+        "section": "206-00: Brake System — General Information"
+      },
+      {
+        "component": "Brake disc",
+        "spec_type": "Minimum thickness",
+        "value": "32",
+        "unit": "mm",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "Brake disc",
+        "spec_type": "Minimum thickness",
+        "value": "23.0",
+        "unit": "mm",
+        "section": "206-04: Rear Disc Brake"
+      }
+    ]
+  },
+  {
+    "query": "Pinion bearing preload",
+    "results": [
+      {
+        "component": "Pinion bearing",
+        "spec_type": "Preload",
+        "value": "1.8-3.3",
+        "unit": "Nm",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Pinion bearing",
+        "spec_type": "Torque preload",
+        "value": "1.8-3.3",
+        "unit": "Nm",
+        "section": "205-03: Front Drive Axle/Differential"
+      },
+      {
+        "component": "Pinion bearing",
+        "spec_type": "Rotational preload",
+        "value": "1.5-3.0",
+        "unit": "Nm",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "Ball joint nut torque",
+    "results": [
+      {
+        "component": "Upper ball joint nut",
+        "spec_type": "Torque",
+        "value": "150",
+        "unit": "Nm",
+        "section": "205-04: Front Drive Halfshafts"
+      },
+      {
+        "component": "Lower ball joint nut",
+        "spec_type": "Torque",
+        "value": "175",
+        "unit": "Nm",
+        "section": "204-01A: Front Suspension — Rear Wheel Drive (RWD)"
+      },
+      {
+        "component": "Upper ball joint nut",
+        "spec_type": "Torque",
+        "value": "115",
+        "unit": "Nm",
+        "section": "204-01A: Front Suspension — Rear Wheel Drive (RWD)"
+      },
+      {
+        "component": "Lower ball joint nut",
+        "spec_type": "Torque",
+        "value": "175",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      },
+      {
+        "component": "Upper ball joint nut",
+        "spec_type": "Torque",
+        "value": "115",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      }
+    ]
+  },
+  {
+    "query": "Halfshaft nut torque",
+    "results": [
+      {
+        "component": "Halfshaft nut",
+        "spec_type": "Torque",
+        "value": "40",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      }
+    ]
+  },
+  {
+    "query": "Maximum driveshaft runout",
+    "results": [
+      {
+        "component": "Driveshaft",
+        "spec_type": "Maximum allowable runout",
+        "value": "0.50",
+        "unit": "mm",
+        "section": "205-00: Driveline System — General Information"
+      }
+    ]
+  },
+  {
+    "query": "Torque for skid plate bolts",
+    "results": [
+      {
+        "component": "Skid plate bolts (SVT Raptor vehicles)",
+        "spec_type": "Torque",
+        "value": "48",
+        "unit": "Nm",
+        "section": "205-01: Driveshaft"
+      },
+      {
+        "component": "Skid plate bolts",
+        "spec_type": "Torque",
+        "value": "48",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      }
+    ]
+  },
+  {
+    "query": "Front drive axle lubricant capacity",
+    "results": [
+      {
+        "component": "Motorcraft SAE 80W-90 Premium Rear Axle Lubricant",
+        "spec_type": "Fluid Capacity",
+        "value": "1.66",
+        "unit": "L",
+        "section": "205-03: Front Drive Axle/Differential"
+      }
+    ]
+  },
+  {
+    "query": "Part number for differential ring gear",
+    "results": [
+      {
+        "component": "Differential ring gear",
+        "spec_type": "Part Number",
+        "value": "4209",
+        "unit": "",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Differential ring gear bolts (12 required)",
+        "spec_type": "Part Number",
+        "value": "4216",
+        "unit": "",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      },
+      {
+        "component": "Differential ring gear",
+        "spec_type": "Part Number",
+        "value": "4209",
+        "unit": "",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Differential ring gear bolt (10 required)",
+        "spec_type": "Part Number",
+        "value": "4216",
+        "unit": "",
+        "section": "205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear"
+      },
+      {
+        "component": "Differential ring gear bolt (12 required)",
+        "spec_type": "Part Number",
+        "value": "4216",
+        "unit": "",
+        "section": "205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear"
+      }
+    ]
+  },
+  {
+    "query": "How much torque for tie-rod end nut",
+    "results": [
+      {
+        "component": "Tie-rod end nut",
+        "spec_type": "Torque",
+        "value": "115",
+        "unit": "Nm",
+        "section": "205-04: Front Drive Halfshafts"
+      },
+      {
+        "component": "Tie-rod end nut",
+        "spec_type": "Torque",
+        "value": "115",
+        "unit": "Nm",
+        "section": "204-01A: Front Suspension — Rear Wheel Drive (RWD)"
+      },
+      {
+        "component": "Tie-rod end nut",
+        "spec_type": "Torque",
+        "value": "115",
+        "unit": "Nm",
+        "section": "204-01B: Front Suspension — Four Wheel Drive (4WD)"
+      }
+    ]
+  },
+  {
+    "query": "Brake pad minimum thickness",
+    "results": [
+      {
+        "component": "Brake pad",
+        "spec_type": "Minimum thickness",
+        "value": "3.0",
+        "unit": "mm",
+        "section": "206-00: Brake System — General Information"
+      },
+      {
+        "component": "Brake pad",
+        "spec_type": "Minimum thickness",
+        "value": "3.0",
+        "unit": "mm",
+        "section": "206-03: Front Disc Brake"
+      },
+      {
+        "component": "Brake pad",
+        "spec_type": "Minimum thickness",
+        "value": "3.0",
+        "unit": "mm",
+        "section": "206-04: Rear Disc Brake"
+      }
+    ]
+  },
+  {
+    "query": "Tire pressure monitoring sensor screw torque",
+    "results": [
+      {
+        "component": "Valve stem-to-Tire Pressure Monitoring System (TPMS) sensor screw",
+        "spec_type": "Torque",
+        "value": "1.5",
+        "unit": "Nm",
+        "section": "204-04: Wheels and Tires"
+      }
+    ]
+  }
+]

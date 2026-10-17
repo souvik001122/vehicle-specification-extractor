@@ -1,0 +1,15 @@
+# Core (enough to run offline end to end)
+numpy
+scikit-learn
+pypdf            # PDF fallback; PyMuPDF is preferred when installed
+
+# Recommended
+pymupdf          # best PDF text extraction (+ OCR hook)
+sentence-transformers   # dense embeddings (auto-detected)
+faiss-cpu        # vector index (auto-detected, numpy fallback otherwise)
+
+# Optional: UI, tests, OCR
+streamlit
+pytest
+pytesseract
+pillow

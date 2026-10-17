@@ -1,0 +1,75 @@
+query,component,spec_type,value,unit,section
+Torque for brake caliper bolts,Brake caliper anchor plate bolts,Torque,250,Nm,206-03: Front Disc Brake
+Torque for brake caliper bolts,Brake caliper flow bolt,Torque,35,Nm,206-03: Front Disc Brake
+Torque for brake caliper bolts,Brake caliper guide pin bolts,Torque,37,Nm,206-03: Front Disc Brake
+Torque for brake caliper bolts,Brake caliper flow bolt,Torque,35,Nm,206-04: Rear Disc Brake
+Torque for brake caliper bolts,Brake caliper guide pin bolts,Torque,33,Nm,206-04: Rear Disc Brake
+Torque for brake caliper bolts,Brake caliper support bracket bolts,Torque,150,Nm,206-04: Rear Disc Brake
+Torque for wheel nuts,Wheel hub nut,Torque,40,Nm,205-04: Front Drive Halfshafts
+Torque for wheel nuts,Wheel nuts,Torque,204,Nm,204-04: Wheels and Tires
+Torque for stabilizer bar link nuts,Stabilizer bar link nuts,Torque,70,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Torque for stabilizer bar link nuts,Stabilizer bar link nuts (SVT Raptor),Torque,80,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Torque for stabilizer bar link nuts,Stabilizer bar link nuts,Torque,70,Nm,204-01A: Front Suspension — Rear Wheel Drive (RWD)
+Torque for stabilizer bar link nuts,Stabilizer bar link lower nuts,Torque,80,Nm,204-00: Suspension System — General Information
+Torque for shock absorber lower nut,Shock absorber lower nuts,Torque,90,Nm,204-01A: Front Suspension — Rear Wheel Drive (RWD)
+Torque for shock absorber lower nut,Shock absorber lower nut (SVT Raptor),Torque,550,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Torque for shock absorber lower nut,Shock absorber lower nuts,Torque,90,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Torque for shock absorber lower nut,Lower shock absorber nuts,Torque,90,Nm,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Torque for shock absorber lower nut,Lower shock absorber nuts,Torque,90,Nm,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Torque for rear driveshaft flange bolts,Rear driveshaft flange bolts,Torque,103,Nm,205-01: Driveshaft
+Torque for rear driveshaft flange bolts,Driveshaft flange bolts,Torque,103,Nm,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Torque for differential housing cover bolts,Differential housing cover bolts,Torque,32,Nm,205-03: Front Drive Axle/Differential
+Torque for differential housing cover bolts,Differential housing cover bolts,Torque,45,Nm,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Torque for differential housing cover bolts,Differential housing cover bolts,Torque,45,Nm,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Rear axle lubricant capacity,Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant,Fluid Capacity,2.84,L,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Rear axle lubricant capacity,Motorcraft SAE 80W-90 Premium Rear Axle Lubricant,Fluid Capacity,1.66,L,205-03: Front Drive Axle/Differential
+Rear axle lubricant capacity,Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (ELD only),Fluid Capacity,2.84,L,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Rear axle lubricant capacity,Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (Non Traction-Lok equipped),Fluid Capacity,2.60,L,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Rear axle lubricant capacity,Motorcraft SAE 75W-140 Synthetic Rear Axle Lubricant (Traction-Lok equipped),Fluid Capacity,2.48,L,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Brake fluid capacity,High Performance DOT 3 Motor Vehicle Brake Fluid,Fluid Capacity,740,ml,206-09: Anti-Lock Brake System (ABS) and Stability Control
+Brake fluid capacity,Motorcraft High Performance DOT 3 Motor Vehicle Brake Fluid (US) / Motorcraft Brake Fluid - Heavy Duty DOT 3 (Canada),Fluid Capacity,740,ml,206-06: Hydraulic Brake Actuation
+Brake fluid capacity,High Performance DOT 3 Motor Vehicle Brake Fluid,Fluid Capacity,1420,ml,206-03: Front Disc Brake
+Brake fluid capacity,High Performance DOT 3 Motor Vehicle Brake Fluid,Fluid Capacity,1420,ml,206-04: Rear Disc Brake
+Brake fluid capacity,Motorcraft High Performance DOT 3 Motor Vehicle Brake Fluid (US) / Motorcraft Brake Fluid - Heavy Duty DOT 3 (Canada),Fluid Capacity,1420,ml,206-00: Brake System — General Information
+Part number for shock absorber,Shock absorber lower bolt,Part Number,W506545,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber lower nut,Part Number,W520214,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber,Part Number,18125,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber upper bolt,Part Number,W506545,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber upper nut,Part Number,W520214,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber,Part Number,18080,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber shield,Part Number,18159,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber shield bolt (3 required),Part Number,18A149-B,,204-02: Rear Suspension
+Part number for shock absorber,Shock absorber shield washer,Part Number,18A149-C,,204-02: Rear Suspension
+Part number for shock absorber,Lower shock absorber nuts (2 required),Part Number,W520214,,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Part number for shock absorber,Lower shock absorber bolts (2 required),Part Number,W506545,,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Part number for shock absorber,Lower shock absorber nuts (2 required),Part Number,W520214,,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Part number for shock absorber,Lower shock absorber bolts (2 required),Part Number,W506545,,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Brake disc minimum thickness,Front brake disc,Minimum thickness,32,mm,206-00: Brake System — General Information
+Brake disc minimum thickness,Rear brake disc,Minimum thickness,23.0,mm,206-00: Brake System — General Information
+Brake disc minimum thickness,Brake disc,Minimum thickness,32,mm,206-03: Front Disc Brake
+Brake disc minimum thickness,Brake disc,Minimum thickness,23.0,mm,206-04: Rear Disc Brake
+Pinion bearing preload,Pinion bearing,Preload,1.8-3.3,Nm,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Pinion bearing preload,Pinion bearing,Torque preload,1.8-3.3,Nm,205-03: Front Drive Axle/Differential
+Pinion bearing preload,Pinion bearing,Rotational preload,1.5-3.0,Nm,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Ball joint nut torque,Upper ball joint nut,Torque,150,Nm,205-04: Front Drive Halfshafts
+Ball joint nut torque,Lower ball joint nut,Torque,175,Nm,204-01A: Front Suspension — Rear Wheel Drive (RWD)
+Ball joint nut torque,Upper ball joint nut,Torque,115,Nm,204-01A: Front Suspension — Rear Wheel Drive (RWD)
+Ball joint nut torque,Lower ball joint nut,Torque,175,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Ball joint nut torque,Upper ball joint nut,Torque,115,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Halfshaft nut torque,Halfshaft nut,Torque,40,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Maximum driveshaft runout,Driveshaft,Maximum allowable runout,0.50,mm,205-00: Driveline System — General Information
+Torque for skid plate bolts,Skid plate bolts (SVT Raptor vehicles),Torque,48,Nm,205-01: Driveshaft
+Torque for skid plate bolts,Skid plate bolts,Torque,48,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Front drive axle lubricant capacity,Motorcraft SAE 80W-90 Premium Rear Axle Lubricant,Fluid Capacity,1.66,L,205-03: Front Drive Axle/Differential
+Part number for differential ring gear,Differential ring gear,Part Number,4209,,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Part number for differential ring gear,Differential ring gear bolts (12 required),Part Number,4216,,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+Part number for differential ring gear,Differential ring gear,Part Number,4209,,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Part number for differential ring gear,Differential ring gear bolt (10 required),Part Number,4216,,205-02A: Rear Drive Axle/Differential — Ford 8.8-Inch Ring Gear
+Part number for differential ring gear,Differential ring gear bolt (12 required),Part Number,4216,,205-02B: Rear Drive Axle/Differential — Ford 9.75-Inch Ring Gear
+How much torque for tie-rod end nut,Tie-rod end nut,Torque,115,Nm,205-04: Front Drive Halfshafts
+How much torque for tie-rod end nut,Tie-rod end nut,Torque,115,Nm,204-01A: Front Suspension — Rear Wheel Drive (RWD)
+How much torque for tie-rod end nut,Tie-rod end nut,Torque,115,Nm,204-01B: Front Suspension — Four Wheel Drive (4WD)
+Brake pad minimum thickness,Brake pad,Minimum thickness,3.0,mm,206-00: Brake System — General Information
+Brake pad minimum thickness,Brake pad,Minimum thickness,3.0,mm,206-03: Front Disc Brake
+Brake pad minimum thickness,Brake pad,Minimum thickness,3.0,mm,206-04: Rear Disc Brake
+Tire pressure monitoring sensor screw torque,Valve stem-to-Tire Pressure Monitoring System (TPMS) sensor screw,Torque,1.5,Nm,204-04: Wheels and Tires

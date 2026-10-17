@@ -1,0 +1,21 @@
+# one question per line; lines starting with # are ignored
+Torque for brake caliper bolts
+Torque for wheel nuts
+Torque for stabilizer bar link nuts
+Torque for shock absorber lower nut
+Torque for rear driveshaft flange bolts
+Torque for differential housing cover bolts
+Rear axle lubricant capacity
+Brake fluid capacity
+Part number for shock absorber
+Brake disc minimum thickness
+Pinion bearing preload
+Ball joint nut torque
+Halfshaft nut torque
+Maximum driveshaft runout
+Torque for skid plate bolts
+Front drive axle lubricant capacity
+Part number for differential ring gear
+How much torque for tie-rod end nut
+Brake pad minimum thickness
+Tire pressure monitoring sensor screw torque
