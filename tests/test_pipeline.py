@@ -160,6 +160,25 @@ Brake caliper guide pin bolts
         self.assertTrue(any(r.component.lower() == "brake caliper flow bolt" and r.value == "35" and r.unit == "Nm" for r in records), records)
         self.assertTrue(any(r.component.lower() == "brake caliper guide pin bolts" and r.value == "37" and r.unit == "Nm" for r in records), records)
 
+    def test_procedure_torque_is_extracted(self):
+        chunk = Chunk(
+            id=10001, doc_index=0, section_id="204-00", section_title="Suspension System — General Information",
+            mode="GENERAL PROCEDURES", heading="Toe Adjustment — Front", kind="text",
+            text="Tighten the tie-rod end jam nut(s) to 103 Nm (76 lb-ft).",
+        )
+        from src.extractor import procedure_records
+        records = procedure_records(chunk, set())
+        self.assertTrue(any(r.value == "103" and r.unit == "Nm" for r in records), records)
+
+    def test_embedded_spec_table_is_parsed(self):
+        chunk = Chunk(
+            id=10002, doc_index=0, section_id="206-00", section_title="Brake System — General Information",
+            mode="SPECIFICATIONS", heading="General Specifications", kind="text",
+            text="Item Specification\nFront brake disc minimum thickness 32 mm (1.259 in)\nRear brake disc minimum thickness 23.0 mm (0.906 in)",
+        )
+        records = table_records(chunk)
+        self.assertTrue(any(r.component == "Front brake disc" and r.value == "32" and r.unit == "mm" for r in records), records)
+
     def test_nonsense_returns_nothing(self):
         self.assertEqual(rows("Torque for flux capacitor bolts"), [])
 
