@@ -1,7 +1,7 @@
 # 🚗 Vehicle Specification Extractor (RAG)
 
 <p align="center">
-  <strong>Extract vehicle specifications from large service manuals using Retrieval-Augmented Generation (RAG) and rule-based extraction.</strong>
+  <strong>Extract structured vehicle specifications from service manuals using hybrid retrieval and rule-based information extraction.</strong>
 </p>
 
 <p align="center">
@@ -22,54 +22,60 @@
 | **Developer** | Souvik Das |
 | **Institution** | National Institute of Technology Delhi (NIT Delhi) |
 | **Department** | Computer Science and Engineering |
-| **Technology** | Python, RAG, SBERT, BM25, Streamlit |
-| **Extraction Method** | Offline rule-based extraction |
+| **Language** | Python |
+| **Retrieval** | Semantic Search, BM25, Reciprocal Rank Fusion (RRF) |
+| **Extraction** | Offline Rule-Based Extraction |
+| **Interface** | Streamlit |
 | **Deployment** | Streamlit Community Cloud |
 
 ## 🌐 Live Demo
 
-**Try the application here:**
+Try the application:
 
-👉 https://vehicle-specification-extractor-uqnpzdnlmhgpigkqfc59mf.streamlit.app/
+**[Open Vehicle Specification Extractor](https://vehicle-specification-extractor-uqnpzdnlmhgpigkqfc59mf.streamlit.app/)**
 
-Ask a question such as:
+Example query:
 
 `Torque for brake caliper bolts`
 
-The application retrieves relevant passages from the vehicle service manual and displays structured specifications with their source sections.
+The application retrieves relevant passages from a vehicle service manual and extracts structured specifications with component names, values, units, and source sections.
 
-> Note: The live demo depends on the deployed application's availability and the sample manual being accessible.
+The default extraction pipeline works offline and does not require an OpenAI API key.
 
 ## 📌 Overview
 
-Vehicle service manuals contain hundreds of pages of technical information, including torque specifications, component measurements, fluid capacities, and repair procedures.
+Vehicle workshop manuals contain hundreds of pages of technical information, including torque specifications, component measurements, fluid capacities, and repair procedures.
 
-Finding a particular specification manually can be time-consuming.
+Finding a specific value manually can be time-consuming, especially when similar components appear in different sections of a manual.
 
-The **Vehicle Specification Extractor** simplifies this process by allowing users to ask natural-language questions and retrieve relevant technical information from a service manual.
+The **Vehicle Specification Extractor** addresses this problem through a Retrieval-Augmented Generation (RAG)-style pipeline that combines hybrid document retrieval with rule-based extraction.
 
-The project uses a hybrid retrieval pipeline combining semantic search and keyword-based ranking, followed by offline rule-based extraction.
+The system retrieves relevant evidence and extracts specifications from the manual rather than relying on unsupported generated values.
 
-For the supplied sample manual, the application reports **852 pages and 898 chunks**.
+The included sample data is a text extraction of a 2014 Ford F-150 Workshop Manual.
 
 ## ✨ Key Features
 
 - 🔍 **Natural-language queries:** Ask questions in simple English.
-- 🧠 **Hybrid retrieval:** Combines dense semantic retrieval with BM25 keyword search and Reciprocal Rank Fusion (RRF).
-- 📄 **Section-aware chunking:** Preserves relevant manual sections and specification tables.
-- 🛠️ **Rule-based extraction:** Extracts component names, specification types, values, and units.
-- 📊 **Structured output:** Displays specifications in a readable table and supports JSON/CSV output.
-- 📚 **Source-aware results:** Associates specifications with their manual sections.
-- 🔒 **No paid API required:** The default extraction pipeline works offline without an OpenAI API key.
-- 🖥️ **Interactive interface:** Built with Streamlit.
+- 🧠 **Hybrid retrieval:** Combines dense semantic retrieval with BM25 keyword ranking and Reciprocal Rank Fusion.
+- 📄 **Section-aware chunking:** Preserves manual section metadata and specification tables.
+- 🔧 **Torque-table extraction:** Extracts torque values and units from supported table layouts.
+- 🛠️ **Procedure extraction:** Recognizes supported torque instructions, measurements, and fluid capacities.
+- 📑 **PDF and text support:** Processes supported PDF and TXT manuals.
+- 🔄 **Improved PDF table handling:** Handles certain torque tables where component names, numeric values, and dash placeholders are split across separate text lines.
+- 📊 **Structured output:** Produces readable results and supports JSON and CSV output.
+- 📚 **Source-aware results:** Associates extracted specifications with their source sections.
+- 🔒 **No paid API required by default:** The standard rule-based extraction pipeline runs without an API key.
+- 🖥️ **Interactive interface:** Provides a Streamlit interface for uploading manuals and querying specifications.
+- 🧪 **Regression testing:** Includes tests for front/rear brake-caliper torque extraction and flattened PDF-style torque tables.
 
-## 🧪 Example
+## 🧪 Example Query and Output
 
-**Question:**
+**Query:**
 
 `Torque for brake caliper bolts`
 
-**Example output:**
+**Example results from the supplied manual:**
 
 | Component | Specification | Value | Unit | Section |
 |---|---|---:|---|---|
@@ -77,12 +83,14 @@ For the supplied sample manual, the application reports **852 pages and 898 chun
 | Brake caliper guide pin bolts | Torque | 33 | Nm | 206-04: Rear Disc Brake |
 | Brake caliper flow bolt | Torque | 35 | Nm | 206-03: Front Disc Brake |
 | Brake caliper flow bolt | Torque | 35 | Nm | 206-04: Rear Disc Brake |
+| Brake caliper anchor plate bolts | Torque | 250 | Nm | 206-03: Front Disc Brake |
+| Brake caliper support bracket bolts | Torque | 150 | Nm | 206-04: Rear Disc Brake |
 
-These example values are taken from the supplied manual's extracted results. The front and rear specifications are kept separate because similar components can have different values.
+These values illustrate why source-section information matters: similar components can have different specifications depending on their location.
 
-The complete output can also contain other relevant fasteners, such as anchor plate and support bracket bolts.
+The exact results returned by the application depend on the manual, its formatting, retrieval quality, and the query.
 
-**Example JSON:**
+### Example JSON
 
 ```json
 [
@@ -96,68 +104,77 @@ The complete output can also contain other relevant fasteners, such as anchor pl
 ]
 ```
 
-The `section` field provides useful source context. Use the `--minimal` option to omit it when only the four requested fields are needed.
+The default output includes the `section` field to provide source context. The `--minimal` option can be used to return only the four core fields: `component`, `spec_type`, `value`, and `unit`.
 
 ## 🧠 How It Works
 
 ```text
-Vehicle Service Manual
-          |
-          v
-  Text Extraction & Cleaning
-          |
-          v
-    Section-Aware Chunking
-          |
-          v
-  Embedding & Search Index
-          |
-          v
- Hybrid Retrieval (SBERT + BM25)
-          |
-          v
-  Relevant Evidence Selection
-          |
-          v
- Offline Rule-Based Extraction
-          |
-          v
- Structured Specifications
-      (JSON / CSV / UI)
+Vehicle Service Manual (PDF / TXT)
+                 |
+                 v
+       Text Extraction & Cleaning
+                 |
+                 v
+          Table Detection
+                 |
+                 v
+         Section-Aware Chunking
+                 |
+                 v
+       Embedding & Search Index
+                 |
+                 v
+       Hybrid Retrieval (Dense
+             + BM25)
+                 |
+                 v
+       Reciprocal Rank Fusion
+                 |
+                 v
+       Relevant Evidence Selection
+                 |
+                 v
+       Offline Rule-Based Extraction
+                 |
+                 v
+      Structured Specifications
+             (JSON / CSV / UI)
 ```
 
 ### Pipeline Components
 
 | Step | Module | Responsibility |
 |---|---|---|
-| 1. Text extraction | `src/pdf_extract.py` | Extracts and cleans text from supported document formats. |
-| 2. Chunking | `src/chunking.py` | Creates section-aware chunks and preserves specification tables. |
-| 3. Embeddings | `src/embeddings.py` | Supports semantic representations and a TF-IDF/LSA fallback. |
-| 4. Retrieval | `src/retriever.py` | Combines dense retrieval, BM25, and RRF ranking. |
-| 5. Extraction | `src/extractor.py` | Identifies supported specifications from retrieved evidence. |
-| 6. Output | `src/main.py` | Produces structured results in JSON or CSV format. |
-| 7. Interface | `app.py` | Provides the Streamlit application. |
+| 1. Document processing | `src/pdf_extract.py` | Extracts and cleans text from supported document formats. |
+| 2. Table parsing | `src/tables.py` | Detects and parses supported torque, specification, material, and parts tables. |
+| 3. Chunking | `src/chunking.py` | Creates section-aware chunks and preserves table structure where supported. |
+| 4. Embeddings | `src/embeddings.py` | Supports semantic embeddings and a TF-IDF/LSA fallback. |
+| 5. Retrieval | `src/retriever.py` | Combines dense retrieval, BM25, and Reciprocal Rank Fusion. |
+| 6. Extraction | `src/extractor.py` | Extracts supported specifications from retrieved evidence using rule-based parsing. |
+| 7. Output | `src/main.py` | Produces structured results and supports JSON/CSV output. |
+| 8. Interface | `app.py` | Provides the Streamlit application and uploaded-manual workflow. |
 
 ## 🛠️ Technology Stack
 
-- **Language:** Python
-- **Semantic retrieval:** Sentence-BERT (SBERT)
+- **Programming language:** Python
+- **Semantic retrieval:** Sentence Transformers / SBERT when available
 - **Keyword retrieval:** BM25
 - **Ranking:** Reciprocal Rank Fusion (RRF)
-- **Numerical processing:** NumPy, scikit-learn
-- **Document processing:** PyMuPDF, with supported fallback parsers
-- **Vector search:** FAISS when available, otherwise NumPy cosine similarity
+- **Fallback representations:** TF-IDF and Latent Semantic Analysis (LSA)
+- **Numerical processing:** NumPy and scikit-learn
+- **Document processing:** PyMuPDF with supported fallback parsers
+- **Vector search:** FAISS when available, otherwise NumPy-based cosine similarity
 - **Frontend:** Streamlit
 - **Output formats:** JSON and CSV
-- **Testing:** Python tests and pytest
+- **Testing:** Python unittest-compatible tests and pytest
 
 ## ⚙️ Installation
 
 ### Prerequisites
 
-- Python 3.10 or a compatible version supported by the dependencies
+- Python 3.10 or a compatible version supported by the installed dependencies
 - pip
-- A vehicle service manual in a supported format
+- A service manual in a supported format
 
 ### 1. Clone the repository
 
@@ -172,7 +189,7 @@ cd vehicle-specification-extractor
 pip install -r requirements.txt
 ```
 
-### 3. Run a query
+### 3. Run a single query
 
 ```bash
 python -m src.main --query "Torque for brake caliper bolts"
@@ -196,9 +213,9 @@ python -m src.main --queries-file queries.txt --out outputs/results.json
 streamlit run app.py
 ```
 
-Open the local URL printed in the terminal to use the application.
+Open the local URL displayed in the terminal.
 
-### 6. Run tests
+### 6. Run the test suite
 
 ```bash
 python tests/test_pipeline.py
@@ -210,6 +227,8 @@ Alternatively, if pytest is installed:
 pytest -q
 ```
 
+The included regression tests cover supported extraction behavior, including a flattened PDF-style torque table represented as a text chunk.
+
 ## 📁 Project Structure
 
 ```text
@@ -219,60 +238,101 @@ vehicle-specification-extractor/
 ├── queries.txt
 ├── requirements.txt
 ├── README.md
+│
 ├── data/
 │   └── sample-service-manual.txt
+│
 ├── outputs/
 │   ├── results.json
 │   ├── results.csv
 │   └── example_minimal.json
+│
 ├── src/
+│   ├── __init__.py
 │   ├── pdf_extract.py
+│   ├── tables.py
+│   ├── textutil.py
 │   ├── chunking.py
 │   ├── embeddings.py
 │   ├── retriever.py
 │   ├── extractor.py
 │   └── main.py
+│
 └── tests/
     └── test_pipeline.py
 ```
 
-*The exact files may vary slightly with the repository version.*
+The structure above reflects the updated project ZIP. Runtime cache files may be created when the application processes manuals.
 
 ## 🎯 Design Decisions
 
-### Section-aware chunking
+### 1. Section-aware chunking
 
-Vehicle manuals often repeat component names across different sections. Preserving section metadata helps distinguish front brake specifications from rear brake specifications.
+Vehicle manuals often repeat component names in different sections. Keeping section metadata helps distinguish front and rear brake specifications and improves source traceability.
 
-### Hybrid retrieval
+### 2. Hybrid retrieval
 
-Dense embeddings help identify semantically related passages, while BM25 helps match exact component names, units, and technical terms. RRF combines their rankings.
+Dense semantic search helps identify passages with related meanings, while BM25 helps match exact technical terms, component names, and units. Reciprocal Rank Fusion combines the rankings.
 
-### Evidence-grounded extraction
+### 3. Evidence-grounded extraction
 
-The rule-based extractor extracts values from retrieved manual content rather than generating specifications from outside knowledge.
+The default rule-based extractor parses supported values from retrieved manual content. This reduces reliance on generated answers, although retrieval and parsing errors can still occur.
 
-### Structured output
+### 4. Improved torque-table parsing
 
-The application returns component names, specification types, values, units, and source sections so results are easier to inspect and reuse.
+PDF text extraction can separate component names, numeric cells, and placeholder values across multiple lines. The updated parser handles certain split-line torque-table layouts and can detect torque tables embedded in ordinary text chunks.
+
+### 5. Source-aware specifications
+
+The section field helps users verify extracted values against the relevant part of the service manual.
+
+### 6. Content-aware upload caching
+
+Uploaded manuals are cached using a content-derived identifier so that uploading a different file with the same filename does not automatically reuse the previous file's cached pipeline.
+
+## 🧪 Testing and Validation
+
+The updated project includes **20 automated tests** covering:
+
+- Query parsing and keyword matching
+- Text cleaning and section-aware chunking
+- Torque extraction for front and rear brake components
+- Wheel-nut torque and other supported specifications
+- Fluid-capacity and measurement extraction
+- JSON and CSV output
+- Handling of a flattened PDF-style torque table
+- Fallback behavior for unsupported or irrelevant queries
+
+The regression test checks the table-parsing issue where component names and numeric values are represented on separate lines.
+
+Passing these tests does not guarantee perfect extraction from every PDF. Results should be validated against the specific manual and vehicle configuration being used.
 
 ## ⚠️ Limitations and Future Improvements
 
-- Extraction accuracy depends on the quality and structure of the source manual.
-- Complex staged torque procedures and angle specifications may require additional parsing rules.
-- Some fluid-capacity tables may produce extra or incomplete rows.
-- Retrieval can return less relevant passages for broad or ambiguous queries.
-- Vehicle configuration differences, such as engine or drivetrain variants, are not necessarily resolved automatically.
+- Extraction quality depends on the source document, PDF text layout, and retrieval quality.
+- Complex or scanned tables may require OCR or more layout-aware table extraction.
+- Staged torque procedures, such as a torque value followed by an additional rotation angle, may not be fully represented in the current output schema.
+- Fluid-capacity tables with wrapped cells may produce extra or incomplete rows.
+- Broad or ambiguous queries can retrieve less relevant evidence.
+- Vehicle-specific variations, including engine, drivetrain, and trim differences, are not necessarily resolved automatically.
 - A labelled evaluation dataset is needed to measure retrieval precision, recall, and extraction accuracy systematically.
 
-Potential improvements include cross-encoder reranking, more robust table parsing, vehicle-variant filtering, page-level citations, and expanded evaluation tests.
+Potential future improvements include:
+
+- Layout-aware PDF table extraction
+- Improved OCR and scanned-table processing
+- Cross-encoder reranking
+- Query expansion for component synonyms
+- Vehicle-variant filtering
+- Page-level citations and evidence highlighting
+- Larger evaluation datasets with precision, recall, and F1 metrics
 
 ## 🔐 Privacy and Safety
 
-- The default pipeline does not require a paid API or API key.
-- Do not commit passwords, credentials, or private configuration files.
-- Publish only service manuals you have permission to redistribute.
-- Treat extracted technical specifications as information to verify against the applicable vehicle and official service manual before performing repairs.
+- The default rule-based pipeline does not require a paid API or API key.
+- Do not commit credentials, passwords, or private configuration files.
+- Publish only service manuals that you have permission to redistribute.
+- Verify extracted specifications against the applicable official service manual and vehicle configuration before carrying out repairs.
 
 ## 👨‍🎓 About the Developer
 
@@ -280,7 +340,7 @@ Potential improvements include cross-encoder reranking, more robust table parsin
 B.Tech, Computer Science and Engineering  
 **National Institute of Technology Delhi (NIT Delhi)**
 
-This project demonstrates the application of information retrieval, natural-language processing, document processing, and structured information extraction to a practical automotive use case.
+This project demonstrates the application of information retrieval, document processing, natural-language processing, and structured information extraction to a practical automotive use case.
 
 ---
 
