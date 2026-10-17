@@ -15,10 +15,24 @@ st.set_page_config(page_title="Vehicle Spec Extractor", layout="wide")
 st.title("Vehicle Specification Extractor")
 
 
+def code_version() -> str:
+    """Short hash of every source file. It is part of the cache key below, so editing any .py file
+    (e.g. a new extractor.py) automatically rebuilds the pipeline instead of reusing a stale cached one."""
+    h = hashlib.sha256()
+    root = Path(__file__).resolve().parent
+    for f in sorted([*root.glob("src/*.py"), root / "config.py"]):
+        h.update(f.name.encode())
+        h.update(f.read_bytes())
+    return h.hexdigest()[:8]
+
+
+CODE_VERSION = code_version()
+
+
 @st.cache_resource(show_spinner="Indexing the manual...")
-def load(path, extract_backend, content_hash=""):
-    # Include the uploaded file's content hash in Streamlit's cache key.
-    # Re-uploading a different PDF with the same filename must rebuild the index.
+def load(path, extract_backend, content_hash="", version=""):
+    # The cache key includes the uploaded file's content hash (a different PDF with the same filename
+    # must rebuild the index) and the code version (changed code must not reuse an old cached pipeline).
     return Pipeline(path, extract_backend=extract_backend)
 
 
@@ -27,6 +41,10 @@ with st.sidebar:
     st.caption("Extractor: rule-based (offline; no API key required)")
     backend = "rules"
     top_k = st.slider("Chunks retrieved", 3, 15, config.TOP_K)
+    st.caption(f"Code version: {CODE_VERSION}")
+    if st.button("Clear cache and re-index"):
+        st.cache_resource.clear()
+        st.rerun()
 
 src = None
 content_hash = "default"
@@ -39,7 +57,7 @@ if upload:
     src = config.CACHE_DIR / f"{Path(upload.name).stem}-{content_hash[:16]}{suffix}"
     if not src.exists():
         src.write_bytes(payload)
-pipe = load(str(src) if src else None, backend, content_hash)
+pipe = load(str(src) if src else None, backend, content_hash, CODE_VERSION)
 st.caption(f"{pipe.source.name}: {len(pipe.pages)} pages, {len(pipe.chunks)} chunks, "
            f"embeddings={pipe.retriever.embedder.backend}, extractor={pipe.extractor.name}")
 
