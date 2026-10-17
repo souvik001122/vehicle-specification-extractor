@@ -48,8 +48,20 @@ class Pipeline:
 
     def run(self, query: str, top_k: int | None = None) -> tuple[list[Record], list[tuple[Chunk, float]], str]:
         """Return (records, retrieved (chunk, score) pairs, extractor used)."""
-        hits = self.retriever.search(query, top_k or config.TOP_K)
+        k = top_k or config.TOP_K
+        hits = self.retriever.search(query, k)
         records, used = self.extractor.extract(query, hits)
+        if not records:
+            # Safety net: the right chunk may sit just outside the top-k (depends on the embedding
+            # model).  Widen the search, then look at every chunk in the manual.
+            wide = self.retriever.search(query, k * 4)
+            records, used = self.extractor.extract(query, wide)
+            if not records:
+                wide = [(c, 0.0) for c in self.chunks]
+                records, used = self.extractor.extract(query, wide)
+            if records:
+                hits = wide if len(wide) <= k * 4 else hits
+                used += " (widened search)"
         return records, hits, used
 
 
