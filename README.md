@@ -62,12 +62,14 @@ The included sample data is a text extraction of a 2014 Ford F-150 Workshop Manu
 - 🔧 **Torque-table extraction:** Extracts torque values and units from supported table layouts.
 - 🛠️ **Procedure extraction:** Recognizes supported torque instructions, measurements, and fluid capacities.
 - 📑 **PDF and text support:** Processes supported PDF and TXT manuals.
-- 🔄 **Improved PDF table handling:** Handles certain torque tables where component names, numeric values, and dash placeholders are split across separate text lines.
+- 🔄 **Robust PDF table parsing:** Handles supported torque tables where component names, numeric values, and dash placeholders are split across multiple lines.
+- 📋 **Split-header recognition:** Recognizes supported torque-table headers even when labels such as `Description`, `Nm`, `lb-ft`, and `lb-in` appear on separate lines.
+- 🔍 **Embedded table detection:** Detects supported torque tables embedded in ordinary text chunks, not only chunks classified as tables.
 - 📊 **Structured output:** Produces readable results and supports JSON and CSV output.
 - 📚 **Source-aware results:** Associates extracted specifications with their source sections.
 - 🔒 **No paid API required by default:** The standard rule-based extraction pipeline runs without an API key.
 - 🖥️ **Interactive interface:** Provides a Streamlit interface for uploading manuals and querying specifications.
-- 🧪 **Regression testing:** Includes tests for front/rear brake-caliper torque extraction and flattened PDF-style torque tables.
+- 🧪 **Regression testing:** Includes tests for front/rear brake-caliper torque extraction and supported flattened PDF-style torque tables.
 
 ## 🧪 Example Query and Output
 
@@ -227,8 +229,6 @@ Alternatively, if pytest is installed:
 pytest -q
 ```
 
-The included regression tests cover supported extraction behavior, including a flattened PDF-style torque table represented as a text chunk.
-
 ## 📁 Project Structure
 
 ```text
@@ -262,7 +262,7 @@ vehicle-specification-extractor/
     └── test_pipeline.py
 ```
 
-The structure above reflects the updated project ZIP. Runtime cache files may be created when the application processes manuals.
+The structure above reflects the documented project layout. Runtime cache files may be created when the application processes manuals.
 
 ## 🎯 Design Decisions
 
@@ -280,7 +280,9 @@ The default rule-based extractor parses supported values from retrieved manual c
 
 ### 4. Improved torque-table parsing
 
-PDF text extraction can separate component names, numeric cells, and placeholder values across multiple lines. The updated parser handles certain split-line torque-table layouts and can detect torque tables embedded in ordinary text chunks.
+PDF text extraction can separate component names, numeric cells, and placeholder values across multiple lines. The updated parser supports certain split-line torque-table layouts and recognizes supported table headers when column labels appear on separate lines.
+
+The extractor can also detect supported torque tables embedded in ordinary text chunks. These improvements target common PDF text-layout variations but do not guarantee successful extraction from every document.
 
 ### 5. Source-aware specifications
 
@@ -292,7 +294,9 @@ Uploaded manuals are cached using a content-derived identifier so that uploading
 
 ## 🧪 Testing and Validation
 
-The updated project includes **20 automated tests** covering:
+The updated project includes **21 automated tests**, including a regression test for torque-table headers split across multiple lines.
+
+The test suite covers:
 
 - Query parsing and keyword matching
 - Text cleaning and section-aware chunking
@@ -300,10 +304,11 @@ The updated project includes **20 automated tests** covering:
 - Wheel-nut torque and other supported specifications
 - Fluid-capacity and measurement extraction
 - JSON and CSV output
-- Handling of a flattened PDF-style torque table
+- Flattened PDF-style torque tables
+- Split-line torque-table headers
 - Fallback behavior for unsupported or irrelevant queries
 
-The regression test checks the table-parsing issue where component names and numeric values are represented on separate lines.
+The regression tests verify supported parsing scenarios, including tables where component names, column labels, and numeric values are represented on separate lines.
 
 Passing these tests does not guarantee perfect extraction from every PDF. Results should be validated against the specific manual and vehicle configuration being used.
 
