@@ -22,9 +22,7 @@ STOPWORDS = {
     "setting", "settings", "i", "my", "f", "150", "ford", "please", "tell", "about", "when", "installing",
     "install", "removal", "remove", "specified", "using", "use", "at", "by", "from", "or", "should", "be",
     "it", "its", "this", "that", "these", "those", "amount", "level", "volume", "refill", "numbers",
-    "which", "listed", "during", "adjustment", "adjust", "applied", "apply", "jam", "minimum", "maximum",
-    "thickness", "runout", "backlash", "clearance", "taper", "angle", "preload", "play", "endplay",
-    "diameter", "length", "wear", "breakaway", "variation", "width", "depth", "front", "rear",
+    "which", "listed", "during", "adjustment", "adjust", "applied", "apply", "jam",
 }
 
 # words that tell which kind of specification is requested
