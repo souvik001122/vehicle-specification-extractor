@@ -25,6 +25,8 @@ STOPWORDS = {
     "which", "listed", "during", "adjustment", "adjust", "applied", "apply", "jam",
     "component", "components", "related", "associated", "relevant", "various", "item", "items", "each", "both",
     "any", "every", "there", "their", "they", "where", "whats", "tell", "give", "provide", "exact", "correct",
+    "hold", "holds", "holding", "contain", "contains", "take", "takes", "requires", "require", "required", "can",
+    "will", "would", "could", "have", "has", "get", "gets", "put", "add", "added", "total", "overall", "approximately",
 }
 
 # words that tell which kind of specification is requested
