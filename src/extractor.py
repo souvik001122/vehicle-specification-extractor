@@ -204,6 +204,8 @@ def filter_and_rank(records: list[Record], qs: QuerySpec) -> list[Record]:
         strict = fast or strict
     if not strict and n >= 3:  # relax one wording mismatch, but require at least two matching query terms
         strict = [(r, f, c) for r, f, c in scored if f >= n - 1 and c >= 1]
+    if not strict and n >= 4:  # long natural question: two words may be phrased differently, but most must match
+        strict = [(r, f, c) for r, f, c in scored if f >= n - 2 and f * 2 >= n and c >= 2]
     strict.sort(key=lambda t: (-t[1], -t[2]))
     return [r for r, _, _ in strict]
 
