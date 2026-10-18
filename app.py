@@ -1,5 +1,7 @@
 """Streamlit UI (bonus):  streamlit run app.py"""
+import csv
 import hashlib
+import io
 import json
 import sys
 from pathlib import Path
@@ -8,6 +10,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config  # noqa: E402
+from src.evaluation import load_expectations, run_batch, summarize  # noqa: E402
 from src.extractor import public  # noqa: E402
 from src.main import Pipeline  # noqa: E402
 
@@ -66,18 +69,50 @@ with st.expander("Extraction diagnostics"):
     st.json(pipe.extraction)
     st.download_button("Download extracted text", pipe.raw_text, f"{pipe.source.stem}-extracted.txt")
 
-query = st.text_input("Question", "Torque for brake caliper bolts")
-if st.button("Extract", type="primary") and query:
-    recs, hits, used = pipe.run(query, top_k)
-    rows = [public(r) for r in recs]
-    st.subheader(f"Extracted specifications: {len(rows)}")
-    st.caption(f"Extractor: {used} · Retrieved evidence chunks: {len(hits)}")
-    if rows:
-        st.dataframe(rows, use_container_width=True)
-        st.download_button("Download JSON", json.dumps(rows, indent=2), "specs.json")
-    else:
-        st.info("No matching specification found in the retrieved chunks.")
-    with st.expander(f"Retrieved evidence ({len(hits)} chunks)"):
-        for c, s in hits:
-            st.markdown(f"**{c.section_id} {c.section_title}** - {c.heading} (score {s:.4f}, {c.kind})")
-            st.code(c.text)
+tab_single, tab_batch = st.tabs(["Single question", "Batch check"])
+
+with tab_single:
+    query = st.text_input("Question", "Torque for brake caliper bolts")
+    if st.button("Extract", type="primary") and query:
+        recs, hits, used = pipe.run(query, top_k)
+        rows = [public(r) for r in recs]
+        st.subheader(f"Extracted specifications: {len(rows)}")
+        st.caption(f"Extractor: {used} · Retrieved evidence chunks: {len(hits)}")
+        if rows:
+            st.dataframe(rows, use_container_width=True)
+            st.download_button("Download JSON", json.dumps(rows, indent=2), "specs.json")
+        else:
+            st.info("No matching specification found in the retrieved chunks.")
+        with st.expander(f"Retrieved evidence ({len(hits)} chunks)"):
+            for c, s in hits:
+                st.markdown(f"**{c.section_id} {c.section_title}** - {c.heading} (score {s:.4f}, {c.kind})")
+                st.code(c.text)
+
+with tab_batch:
+    st.write("Upload a CSV with a `query` column to run every question on the loaded manual. "
+             "Optional columns `component_contains, value, unit, section_contains` turn each row into a "
+             "PASS/FAIL check (`value` = NONE means the manual has no answer). "
+             "Format example: `tests/expected_queries.csv`.")
+    csv_file = st.file_uploader("Queries / expected answers (.csv)", type=["csv"], key="batch_csv")
+    if csv_file is not None:
+        try:
+            exp_rows = load_expectations(csv_file.getvalue())
+        except Exception as e:  # bad encoding / missing column
+            st.error(f"Could not read the CSV: {e}")
+            exp_rows = []
+        if exp_rows and st.button("Run batch", type="primary"):
+            bar = st.progress(0.0)
+            report = run_batch(pipe, exp_rows, top_k, progress=bar.progress)
+            bar.empty()
+            s = summarize(report)
+            if s["checks"]:
+                st.subheader(f"Score: {s['passed']}/{s['checks']} checks passed "
+                             f"({s['queries_fully_correct']}/{s['queries']} queries fully correct)")
+            else:
+                st.subheader(f"{len(report)} queries run (no expected values given)")
+            st.dataframe(report, use_container_width=True)
+            out = io.StringIO()
+            w = csv.DictWriter(out, fieldnames=list(report[0].keys()))
+            w.writeheader()
+            w.writerows(report)
+            st.download_button("Download results CSV", out.getvalue(), "batch-results.csv")
