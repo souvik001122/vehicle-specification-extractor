@@ -71,7 +71,7 @@ The included sample data is a text extraction of a 2014 Ford F-150 Workshop Manu
 - 🖥️ **Interactive interface:** Provides a Streamlit interface for uploading manuals and querying specifications.
 - 📄 **PDF-layout robust:** Tries several PDF text-extraction strategies (PyMuPDF word-position rows, PyMuPDF text, pypdf, pdfminer), keeps the one that yields the most specification rows, and rebuilds tables that arrive one cell per line. Uploaded PDFs give the same answers as the text version of the manual.
 - 🛡️ **Never-empty retrieval:** Spec tables are always kept among the retrieved evidence, and if nothing is extracted the search is automatically widened, so a different embedding model (SBERT, OpenAI, TF-IDF) does not cause "0 specifications" results.
-- 🧪 **Regression testing:** 38 automated tests, including PDF-layout robustness, full-sentence questions, front/rear brake-caliper torque extraction, flattened PDF-style torque tables and the zero-result regression.
+- 🧪 **Regression testing:** 40 automated tests, including PDF-layout robustness, full-sentence questions, front/rear brake-caliper torque extraction, flattened PDF-style torque tables and the zero-result regression.
 
 ## 🧪 Example Query and Output
 
@@ -261,6 +261,7 @@ vehicle-specification-extractor/
 │   ├── __init__.py
 │   ├── pdf_extract.py
 │   ├── reflow.py
+│   ├── evaluation.py
 │   ├── tables.py
 │   ├── textutil.py
 │   ├── chunking.py
@@ -312,6 +313,8 @@ python tests/evaluate.py --embed-backend sbert # the embeddings used in the app
 
 It prints PASS/FAIL per answer and a summary; failures show what the pipeline returned instead.
 
+**In the Streamlit app:** open the **Batch check** tab, upload `tests/expected_queries.csv` (or your own CSV) and press **Run batch**. Every query runs on the manual loaded in the sidebar; you get PASS/FAIL per row, an overall score and a results CSV to download. Only a `query` column is required; rows without a `value` are just run (status RAN). The app and `tests/evaluate.py` share `src/evaluation.py`, so they always give the same verdicts.
+
 ### 6. Retrieval that cannot return an empty answer
 
 An earlier version removed every retrieved chunk that did not contain all the words of the query. Spec tables often leave out a word (for example, the fluid-capacity table never says "drive", only its section title does), so with SBERT embeddings the correct table was dropped and many queries returned **0 specifications**. The current design:
@@ -339,7 +342,7 @@ Uploaded manuals are cached using a content-derived identifier so that uploading
 
 ## 🧪 Testing and Validation
 
-The project includes **38 automated tests**, including PDF-layout tests (flattened tables, strategy selection, cleaning), full-sentence natural-language questions, regression tests for torque-table headers split across multiple lines and for the zero-result retrieval bug.
+The project includes **40 automated tests**, including PDF-layout tests (flattened tables, strategy selection, cleaning), full-sentence natural-language questions, regression tests for torque-table headers split across multiple lines and for the zero-result retrieval bug.
 
 The test suite covers:
 
