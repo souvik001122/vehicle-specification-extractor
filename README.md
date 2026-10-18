@@ -300,6 +300,18 @@ The extractor can also detect supported torque tables embedded in ordinary text 
 
 The section field helps users verify extracted values against the relevant part of the service manual.
 
+### Checking accuracy yourself
+
+`tests/expected_queries.csv` lists 31 questions with 39 hand-verified answers (each with the manual line number it was read from). Run
+
+```bash
+python tests/evaluate.py                       # manual in data/
+python tests/evaluate.py --source my.pdf       # a PDF
+python tests/evaluate.py --embed-backend sbert # the embeddings used in the app
+```
+
+It prints PASS/FAIL per answer and a summary; failures show what the pipeline returned instead.
+
 ### 6. Retrieval that cannot return an empty answer
 
 An earlier version removed every retrieved chunk that did not contain all the words of the query. Spec tables often leave out a word (for example, the fluid-capacity table never says "drive", only its section title does), so with SBERT embeddings the correct table was dropped and many queries returned **0 specifications**. The current design:
