@@ -59,7 +59,12 @@ if upload:
         src.write_bytes(payload)
 pipe = load(str(src) if src else None, backend, content_hash, CODE_VERSION)
 st.caption(f"{pipe.source.name}: {len(pipe.pages)} pages, {len(pipe.chunks)} chunks, "
-           f"embeddings={pipe.retriever.embedder.backend}, extractor={pipe.extractor.name}")
+           f"embeddings={pipe.retriever.embedder.backend}, extractor={pipe.extractor.name}, "
+           f"text extraction={pipe.extraction.get('strategy', '?')}")
+with st.expander("Extraction diagnostics"):
+    st.write("Specification rows found by each PDF text-extraction strategy (the best one is used):")
+    st.json(pipe.extraction)
+    st.download_button("Download extracted text", pipe.raw_text, f"{pipe.source.stem}-extracted.txt")
 
 query = st.text_input("Question", "Torque for brake caliper bolts")
 if st.button("Extract", type="primary") and query:
