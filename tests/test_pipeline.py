@@ -249,5 +249,128 @@ class TestNeverZeroRegression(unittest.TestCase):
         self.assertIn("widened", used)
 
 
+class TestNaturalLanguageQuestions(unittest.TestCase):
+    """Full-sentence questions (not only keyword queries). Expected values were read by hand from the manual."""
+
+    CASES = [
+        ("What torque should be applied to the tie-rod end jam nut during front toe adjustment?", "jam nut", "103"),
+        ("How tight should the front brake caliper guide pin bolts be?", "guide pin", "37"),
+        ("What is the torque for the rear brake caliper guide pin bolts?", "guide pin", "33"),
+        ("What is the wheel nut torque?", "Wheel nuts", "204"),
+        ("What is the minimum thickness of the front brake disc?", "Front brake disc", "32"),
+        ("What is the tightening torque of the halfshaft nut?", "Halfshaft nut", "40"),
+        ("What torque should the stabilizer bar link nuts be tightened to?", "Stabilizer bar link nuts", "70"),
+        ("Which part number is the shock absorber lower bolt?", "Shock absorber lower bolt", "W506545"),
+        ("What is the maximum allowable driveshaft runout?", "Driveshaft", "0.50"),
+        ("What torque do the differential housing cover bolts need?", "Differential housing cover bolts", "45"),
+    ]
+
+    def test_questions(self):
+        for q, comp, value in self.CASES:
+            with self.subTest(q=q):
+                self.assertTrue(has(rows(q), comp, value), msg=f"{q} -> {rows(q)}")
+
+    def test_jam_nut_component_name_and_section(self):
+        rs = rows("Torque for the tie-rod end jam nut")
+        self.assertTrue(has(rs, "Tie-rod end jam nut", "103", "Nm", "204-00"))
+
+    def test_generic_nuts_step_keeps_full_part_name(self):
+        # "Install the 2 new stabilizer bar link lower nuts. Tighten the nuts to 80 Nm"
+        self.assertTrue(has(rows("Torque for stabilizer bar link nuts"), "Stabilizer bar link lower nuts", "80", "Nm"))
+
+
+class TestPdfLayouts(unittest.TestCase):
+    """PDF libraries differ in how they lay out tables; every layout must give the same specifications."""
+
+    @staticmethod
+    def _records(raw):
+        from src.chunking import chunk_documents
+        from src.extractor import table_records
+        from src.pdf_extract import parse_manual
+        return {(r.component.lower(), r.spec_type, r.value, r.unit, r.section_id)
+                for c in chunk_documents(parse_manual(raw)) if c.is_table for r in table_records(c)}
+
+    def test_reflow_torque_cells(self):
+        from src.reflow import reflow
+        cells = ["Description", "Nm", "lb-ft", "lb-in", "Wheel hub nut", "40", "30", "—",
+                 "Integrated Wheel End (IWE) bolts", "12", "—", "106"]
+        self.assertEqual(reflow(cells), ["Description Nm lb-ft lb-in", "Wheel hub nut 40 30 —",
+                                         "Integrated Wheel End (IWE) bolts 12 — 106"])
+
+    def test_reflow_spec_and_parts_cells(self):
+        from src.reflow import reflow
+        spec = ["Item", "Specification", "Front brake disc minimum thickness", "32 mm (1.259 in)"]
+        self.assertEqual(reflow(spec), ["Item Specification", "Front brake disc minimum thickness 32 mm (1.259 in)"])
+        parts = ["Item", "Part Number", "Description", "1", "W506545", "Shock absorber lower bolt",
+                 "7", "18A149-B", "Shock absorber shield bolt (3 required)"]
+        self.assertEqual(reflow(parts), ["Item Part Number Description", "1 W506545 Shock absorber lower bolt",
+                                         "7 18A149-B Shock absorber shield bolt (3 required)"])
+
+    def test_reflow_leaves_normal_text_alone(self):
+        from src.reflow import reflow
+        from src.pdf_extract import parse_manual
+        lines = ["Description Nm lb-ft lb-in", "Wheel hub nut 40 30 —", "Tighten to 37 Nm (27 lb-ft)."]
+        self.assertEqual(reflow(lines), lines)
+
+    def test_flattened_manual_gives_the_same_specifications(self):
+        sys.path.insert(0, str(ROOT / "tests"))
+        from flatten import flatten
+        raw = (config.DATA_DIR / "sample-service-manual.txt").read_text(encoding="utf-8")
+        a, b = self._records(raw), self._records(flatten(raw))
+        self.assertGreater(len(a), 300)
+        self.assertEqual(a - b, set(), msg="specifications lost when cells arrive one per line")
+
+    def test_rows_from_words(self):
+        from src.pdf_extract import rows_from_words
+        w = lambda x0, y, t: (x0, y, x0 + 30, y + 10, t, 0, 0, 0)       # noqa: E731
+        words = [w(200, 101, "37"), w(10, 100, "Guide"), w(60, 100, "pin"), w(250, 100, "27"), w(10, 130, "Next"),
+                 w(300, 100, "—")]
+        self.assertEqual(rows_from_words(words), ["Guide pin 37 27 —", "Next"])
+
+    def test_best_strategy_is_chosen_by_specification_yield(self):
+        import tempfile
+        from src import pdf_extract
+        sys.path.insert(0, str(ROOT / "tests"))
+        from flatten import flatten
+        raw = (config.DATA_DIR / "sample-service-manual.txt").read_text(encoding="utf-8")
+        broken = "\n".join(ln for ln in raw.split("\n") if "Nm" not in ln)      # a strategy that loses the torque tables
+        old_strats, old_cache = pdf_extract.STRATEGIES, config.CACHE_DIR
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                config.CACHE_DIR = Path(d)
+                pdf = Path(d) / "m.pdf"
+                pdf.write_bytes(b"%PDF-fake")
+                pdf_extract.STRATEGIES = [("bad", lambda p: broken), ("flat", lambda p: flatten(raw)),
+                                          ("crash", lambda p: 1 / 0)]
+                text, info = pdf_extract.read_raw_info(pdf)
+                self.assertEqual(info["strategy"], "flat")
+                self.assertIn("crash", info["errors"])
+                self.assertTrue(pdf_extract.read_raw_info(pdf)[1]["cached"])     # second call uses the cache
+        finally:
+            pdf_extract.STRATEGIES, config.CACHE_DIR = old_strats, old_cache
+
+    def test_clean_line_handles_tabs_and_zero_width_characters(self):
+        from src.pdf_extract import _clean_line
+        self.assertEqual(_clean_line("Wheel\thub\tnut\t40\t30\t\u2014"), "Wheel hub nut 40 30 \u2014")
+        self.assertEqual(_clean_line("CXY\u200b80W90-1L"), "CXY80W90-1L")
+
+
+class TestRegionAlternatives(unittest.TestCase):
+    def test_front_and_rear_are_alternatives(self):
+        qs = parse_query("What are the torque specifications for the front and rear brake caliper components?")
+        self.assertEqual(qs.keywords, ["brake", "caliper"])
+        self.assertEqual(sorted(qs.regions), ["front", "rear"])
+
+    def test_front_and_rear_question_returns_both(self):
+        rs = rows("What are the torque specifications for the front and rear brake caliper components?")
+        self.assertTrue(has(rs, "guide pin", "37", "Nm", "206-03"))
+        self.assertTrue(has(rs, "guide pin", "33", "Nm", "206-04"))
+        self.assertTrue(has(rs, "anchor plate", "250", "Nm"))
+        self.assertTrue(has(rs, "support bracket", "150", "Nm"))
+
+    def test_minimum_front_brake_disc_thickness(self):
+        self.assertTrue(has(rows("What is the minimum front brake disc thickness?"), "brake disc", "32", "mm"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
