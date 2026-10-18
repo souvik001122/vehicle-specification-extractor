@@ -23,6 +23,8 @@ STOPWORDS = {
     "install", "removal", "remove", "specified", "using", "use", "at", "by", "from", "or", "should", "be",
     "it", "its", "this", "that", "these", "those", "amount", "level", "volume", "refill", "numbers",
     "which", "listed", "during", "adjustment", "adjust", "applied", "apply", "jam",
+    "component", "components", "related", "associated", "relevant", "various", "item", "items", "each", "both",
+    "any", "every", "there", "their", "they", "where", "whats", "tell", "give", "provide", "exact", "correct",
 }
 
 # words that tell which kind of specification is requested
@@ -74,6 +76,7 @@ class QuerySpec:
     spec_type: str | None = None          # torque | capacity | part_number | measurement | None (any)
     keywords: list[str] = field(default_factory=list)   # stemmed component words
     fastener: str | None = None           # bolt / nut / screw ... if the query names one
+    regions: list[str] = field(default_factory=list)    # "front and rear" -> both are accepted, neither is required
 
 
 def parse_query(query: str) -> QuerySpec:
@@ -97,8 +100,14 @@ def parse_query(query: str) -> QuerySpec:
         s = stem(t)
         if s not in keywords:
             keywords.append(s)
+    # "front and rear brake calipers": a part cannot be both, so the two words are alternatives, not requirements
+    regions: list[str] = []
+    for a, b in (("front", "rear"), ("left", "right"), ("lh", "rh"), ("upper", "lower")):
+        if a in keywords and b in keywords:
+            regions += [a, b]
+            keywords = [k for k in keywords if k not in (a, b)]
     fastener = next((k for k in keywords if k in FASTENERS), None)
-    return QuerySpec(raw=q, spec_type=spec_type, keywords=keywords, fastener=fastener)
+    return QuerySpec(raw=q, spec_type=spec_type, keywords=keywords, fastener=fastener, regions=regions)
 
 
 # query expansion for lexical + dense retrieval
