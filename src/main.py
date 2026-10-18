@@ -20,7 +20,7 @@ import config  # noqa: E402
 from .chunking import Chunk, chunk_documents  # noqa: E402
 from .embeddings import Embedder  # noqa: E402
 from .extractor import Extractor, Record, public  # noqa: E402
-from .pdf_extract import Doc, load_documents  # noqa: E402
+from .pdf_extract import Doc, load_documents_info  # noqa: E402
 from .retriever import Retriever  # noqa: E402
 
 
@@ -39,7 +39,8 @@ class Pipeline:
     def __init__(self, source: str | Path | None = None, extract_backend: str | None = None,
                  embed_backend: str | None = None):
         self.source = Path(source) if source else default_source()
-        self.docs: list[Doc] = load_documents(self.source)
+        self.docs, self.extraction, self.raw_text = load_documents_info(self.source)
+        self.docs: list[Doc]
         self.pages: list[str] = [p for d in self.docs for p in d.pages]
         self.chunks: list[Chunk] = chunk_documents(self.docs)
         self.retriever = Retriever(self.chunks, Embedder(embed_backend))
@@ -98,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--top-k", type=int, default=config.TOP_K, help="chunks to retrieve (default %(default)s)")
     ap.add_argument("--extract-backend", choices=["auto", "rules", "openai", "anthropic"], default=None)
     ap.add_argument("--embed-backend", choices=["auto", "tfidf", "sbert", "openai"], default=None)
+    ap.add_argument("--dump-text", metavar="FILE", help="write the extracted manual text to FILE (for debugging PDFs)")
     ap.add_argument("--minimal", action="store_true", help="only component/spec_type/value/unit (no section)")
     ap.add_argument("--show-chunks", action="store_true", help="print the retrieved chunks to stderr")
     ap.add_argument("-v", "--verbose", action="store_true")
@@ -105,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="%(levelname)s %(message)s")
 
     queries = _read_queries(args)
-    if not queries:
+    if not queries and not args.dump_text:
         ap.error("give --query or --queries-file")
 
     pipe = Pipeline(args.source, extract_backend=args.extract_backend, embed_backend=args.embed_backend)
@@ -113,6 +115,12 @@ def main(argv: list[str] | None = None) -> int:
           f"embeddings={pipe.retriever.embedder.backend}/{pipe.retriever.index.kind} | extractor={pipe.extractor.name}",
           file=sys.stderr)
 
+    print(f"text extraction: {pipe.extraction.get('strategy')} {pipe.extraction.get('scores') or ''}", file=sys.stderr)
+    if args.dump_text:
+        Path(args.dump_text).write_text(pipe.raw_text, encoding="utf-8")
+        print(f"extracted text written to {args.dump_text}", file=sys.stderr)
+    if not queries:
+        return 0
     results: list[tuple[str, list[dict]]] = []
     for q in queries:
         records, hits, used = pipe.run(q, args.top_k)
