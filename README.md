@@ -69,8 +69,9 @@ The included sample data is a text extraction of a 2014 Ford F-150 Workshop Manu
 - 📚 **Source-aware results:** Associates extracted specifications with their source sections.
 - 🔒 **No paid API required by default:** The standard rule-based extraction pipeline runs without an API key.
 - 🖥️ **Interactive interface:** Provides a Streamlit interface for uploading manuals and querying specifications.
+- 📄 **PDF-layout robust:** Tries several PDF text-extraction strategies (PyMuPDF word-position rows, PyMuPDF text, pypdf, pdfminer), keeps the one that yields the most specification rows, and rebuilds tables that arrive one cell per line. Uploaded PDFs give the same answers as the text version of the manual.
 - 🛡️ **Never-empty retrieval:** Spec tables are always kept among the retrieved evidence, and if nothing is extracted the search is automatically widened, so a different embedding model (SBERT, OpenAI, TF-IDF) does not cause "0 specifications" results.
-- 🧪 **Regression testing:** 25 automated tests, including front/rear brake-caliper torque extraction, flattened PDF-style torque tables and the zero-result regression.
+- 🧪 **Regression testing:** 38 automated tests, including PDF-layout robustness, full-sentence questions, front/rear brake-caliper torque extraction, flattened PDF-style torque tables and the zero-result regression.
 
 ## 🧪 Example Query and Output
 
@@ -154,7 +155,8 @@ Vehicle Service Manual (PDF / TXT)
 
 | Step | Module | Responsibility |
 |---|---|---|
-| 1. Document processing | `src/pdf_extract.py` | Extracts and cleans text from supported document formats. |
+| 1. Document processing | `src/pdf_extract.py` | Extracts and cleans text. For PDFs it runs several strategies and keeps the one with the highest specification yield (result cached in `.cache/`). |
+| 1b. Table reflow | `src/reflow.py` | Rebuilds torque, specification and parts tables that a PDF library split into one cell per line, so every layout reaches the parsers in the same one-row-per-line shape. |
 | 2. Table parsing | `src/tables.py` | Detects and parses supported torque, specification, material, and parts tables. |
 | 3. Chunking | `src/chunking.py` | Creates section-aware chunks and preserves table structure where supported. |
 | 4. Embeddings | `src/embeddings.py` | Supports semantic embeddings and a TF-IDF/LSA fallback. |
@@ -258,6 +260,7 @@ vehicle-specification-extractor/
 ├── src/
 │   ├── __init__.py
 │   ├── pdf_extract.py
+│   ├── reflow.py
 │   ├── tables.py
 │   ├── textutil.py
 │   ├── chunking.py
@@ -267,7 +270,8 @@ vehicle-specification-extractor/
 │   └── main.py
 │
 └── tests/
-    └── test_pipeline.py
+    ├── test_pipeline.py
+    └── flatten.py
 ```
 
 The structure above reflects the documented project layout. Runtime cache files may be created when the application processes manuals.
@@ -306,13 +310,24 @@ An earlier version removed every retrieved chunk that did not contain all the wo
 
 Stopwords such as `front`, `rear`, `minimum` and `taper` are kept as real query words, so "rear driveshaft flange bolts" does not return front rows and "brake pad minimum thickness" does not return taper-wear rows.
 
-### 7. Content-aware upload caching
+### 7. PDF layouts: choose by results, then normalise
+
+The same table can come out of a PDF library as one line per row (`Wheel hub nut 40 30 —`) or one line per cell. The parsers expect the first shape, so:
+
+- `rows_from_words` rebuilds visual rows from PyMuPDF word positions;
+- `read_raw_info` runs every available strategy and keeps the one that yields the most specification rows (the scores are shown in the app under "Extraction diagnostics");
+- `reflow` converts any remaining one-cell-per-line tables back to one row per line;
+- tabs and zero-width characters, which some libraries insert between words, are cleaned.
+
+`tests/flatten.py` turns the manual's tables into one-cell-per-line form, and a test checks that no specification is lost. `python -m src.main --dump-text out.txt` writes the extracted text so a problem PDF can be inspected.
+
+### 8. Content-aware upload caching
 
 Uploaded manuals are cached using a content-derived identifier so that uploading a different file with the same filename does not automatically reuse the previous file's cached pipeline.
 
 ## 🧪 Testing and Validation
 
-The project includes **25 automated tests**, including regression tests for torque-table headers split across multiple lines and for the zero-result retrieval bug.
+The project includes **38 automated tests**, including PDF-layout tests (flattened tables, strategy selection, cleaning), full-sentence natural-language questions, regression tests for torque-table headers split across multiple lines and for the zero-result retrieval bug.
 
 The test suite covers:
 
@@ -327,6 +342,8 @@ The test suite covers:
 - Fallback behavior for unsupported or irrelevant queries
 - Queries whose words are missing from the spec table (for example "Front drive axle lubricant capacity")
 - Automatic search widening when retrieval returns only text chunks
+- Questions that name both regions ("front and rear brake caliper components") are treated as alternatives
+- Full-sentence questions such as "What torque should be applied to the tie-rod end jam nut during front toe adjustment?" (the step heading can supply up to two query words that the component name lacks)
 - LLM-path safety checks with a fake model (hallucinated values are dropped)
 
 The regression tests verify supported parsing scenarios, including tables where component names, column labels, and numeric values are represented on separate lines.
