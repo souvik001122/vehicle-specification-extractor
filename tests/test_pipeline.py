@@ -372,5 +372,27 @@ class TestRegionAlternatives(unittest.TestCase):
         self.assertTrue(has(rows("What is the minimum front brake disc thickness?"), "brake disc", "32", "mm"))
 
 
+class TestBatchCheck(unittest.TestCase):
+    CSV = ("query,component_contains,value,unit,section_contains\n"
+           "Torque for wheel nuts,wheel,204,Nm,204-04\n"
+           "Torque for wheel nuts,wheel,999,Nm,\n"
+           "flux capacitor torque,,NONE,,\n"
+           "Brake disc minimum thickness,,,,\n")
+
+    def test_batch_statuses_and_summary(self):
+        from src.evaluation import load_expectations, run_batch, summarize
+        rows_ = load_expectations(self.CSV.encode("utf-8-sig"))
+        self.assertEqual(len(rows_), 4)
+        report = run_batch(pipe(), rows_)
+        self.assertEqual([r["status"] for r in report], ["PASS", "FAIL", "PASS", "RAN"])
+        s = summarize(report)
+        self.assertEqual((s["checks"], s["passed"], s["failed"], s["run_only"]), (3, 2, 1, 1))
+
+    def test_missing_query_column(self):
+        from src.evaluation import load_expectations
+        with self.assertRaises(ValueError):
+            load_expectations("question,value\nx,1\n")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
