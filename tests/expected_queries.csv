@@ -1,0 +1,40 @@
+query,component_contains,value,unit,section_contains,manual_line
+Torque for brake caliper bolts,guide pin,37,Nm,206-03,12065
+Torque for brake caliper bolts,guide pin,33,Nm,206-04,12296
+Torque for brake caliper bolts,anchor plate,250,Nm,206-03,12063
+Torque for brake caliper bolts,support bracket,150,Nm,206-04,12297
+Torque for brake caliper bolts,flow bolt,35,Nm,206-03,12064
+How tight should the front brake caliper guide pin bolts be?,guide pin,37,Nm,206-03,12065
+What are the torque specifications for the front and rear brake caliper components?,guide pin,37,Nm,206-03,12065
+What are the torque specifications for the front and rear brake caliper components?,guide pin,33,Nm,206-04,12296
+What are the torque specifications for the front and rear brake caliper components?,support bracket,150,Nm,206-04,12297
+Torque for wheel nuts,wheel nut,204,Nm,204-04,3944
+Torque for skid plate bolts,skid plate,48,Nm,204-01,1167
+What is the torque for the lower ball joint nut?,lower ball joint,175,Nm,204-01,771
+Torque for upper arm-to-frame nuts,upper arm,150,Nm,204-01,778
+Tie-rod end nut torque,tie-rod end nut,115,Nm,204-01,777
+What torque should be applied to the tie-rod end jam nut during front toe adjustment?,jam nut,103,Nm,204-00,756
+Torque for rear driveshaft flange bolts,driveshaft flange,103,Nm,205-01,5334
+Differential housing cover bolts torque,housing cover,45,Nm,205-02A,5756
+Differential housing cover bolts torque,housing cover,45,Nm,205-02B,7053
+Differential housing cover bolts torque,housing cover,32,Nm,205-03,8702
+Halfshaft nut torque,halfshaft nut,40,Nm,204-01,1159
+Shock rod nut torque,shock rod nut,55,Nm,204-01,774
+TPMS sensor screw torque,sensor screw,1.5,Nm,204-04,2057
+What is the minimum front brake disc thickness?,brake disc,32,mm,206,11149
+Rear brake disc minimum thickness,brake disc,23.0,mm,206,11150
+Brake pad minimum thickness,brake pad,3.0,mm,206,11153
+Maximum allowable driveshaft runout,driveshaft,0.50,mm,205-00,3968
+Drive pinion flange runout,pinion flange,0.25,mm,205-00,3967
+Pinion bearing rotational preload,pinion bearing,1.5-3.0,Nm,205-02A,5725
+Pinion bearing preload,pinion bearing,1.8-3.3,Nm,205-0,7044
+Minimum Traction-Lok breakaway torque,breakaway,27,Nm,205-00,3969
+Brake fluid capacity,brake fluid,1420,ml,206-03,12050
+How much brake fluid does the system hold?,brake fluid,1420,ml,206,12050
+Rear axle lubricant capacity,rear axle lubricant,2.84,L,205-02A,5698
+Front drive axle lubricant capacity,lubricant,1.66,L,205-03,8658
+Part number for shock absorber lower bolt,lower bolt,W506545,,204-02,1888
+What is the part number of the shock absorber lower nut?,lower nut,W520214,,204-02,1889
+Part number for differential ring gear,ring gear,4209,,205-02,5972
+Torque for flux capacitor bolts,,NONE,,,
+Engine oil capacity,,NONE,,,
